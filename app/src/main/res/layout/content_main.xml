@@ -8,4 +8,134 @@
     tools:context="com.cristianodevpro.contab.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <Button
+        android:id="@+id/buttonNovaReceita"
+        android:layout_width="300"
+        android:layout_height="60"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/nova_receita"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonNovaDespesa"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonNovaDespesa"
+        android:layout_width="300"
+        android:layout_height="60"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/nova_despesa"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewSaldoMain"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/saldo"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        app:fontFamily="@font/advent_pro_semibold"
+        app:layout_constraintTop_toTopOf="@+id/imageView"
+        tools:layout_editor_absoluteX="152dp" />
+
+    <TextView
+        android:id="@+id/textViewReceitasMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/receitas"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textSize="24sp"
+        app:fontFamily="@font/advent_pro_semibold"
+        app:layout_constraintStart_toStartOf="@+id/textViewDespesasMain"
+        app:layout_constraintTop_toBottomOf="@+id/textViewShowSaldoMain" />
+
+    <TextView
+        android:id="@+id/textViewDespesasMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/despesas"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textSize="24sp"
+        app:fontFamily="@font/advent_pro_semibold"
+        app:layout_constraintTop_toBottomOf="@+id/textViewReceitasMain"
+        tools:layout_editor_absoluteX="106dp" />
+
+    <TextView
+        android:id="@+id/textViewShowSaldoMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_saldo_main"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/colorPrimaryDark"
+        app:fontFamily="@font/advent_pro_semibold"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSaldoMain"
+        tools:layout_editor_absoluteX="136dp"
+        tools:text="1024,78€" />
+
+    <TextView
+        android:id="@+id/textViewShowReceitasMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/show_receitas_main"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@android:color/holo_green_light"
+        android:textSize="24sp"
+        app:fontFamily="@font/advent_pro_semibold"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/textViewDespesasMain"
+        app:layout_constraintTop_toBottomOf="@+id/textViewShowSaldoMain"
+        tools:text="24,78€" />
+
+    <TextView
+        android:id="@+id/textViewShowDespesasMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/show_despesas_main"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="24sp"
+        app:fontFamily="@font/advent_pro_semibold"
+        app:layout_constraintEnd_toEndOf="@+id/textViewShowReceitasMain"
+        app:layout_constraintTop_toBottomOf="@+id/textViewShowReceitasMain"
+        tools:text="284,82€" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="252dp"
+        android:layout_height="251dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonNovaReceita"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.567"
+        app:srcCompat="@drawable/circle_main" />
 </android.support.constraint.ConstraintLayout>
