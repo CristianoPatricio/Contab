@@ -5,33 +5,33 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
-        <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_ldia"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Listar por dia" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/nav_lmes"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Listar por mês" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_lano"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Listar por ano" />
+        <item
+            android:id="@+id/nav_ltodos"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Listar todos" />
+        <item
+            android:id="@+id/nav_orca"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Definir orçamento" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Acerca">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/nav_sobre"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Sobre" />
         </menu>
     </item>
 
