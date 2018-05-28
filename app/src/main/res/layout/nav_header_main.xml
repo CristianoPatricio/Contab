@@ -18,6 +18,6 @@
         android:layout_height="101dp"
         android:contentDescription="TODO"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@drawable/Logo_Menu" />
+        app:srcCompat="@drawable/logo_menu" />
 
 </LinearLayout>

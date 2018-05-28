@@ -5,4 +5,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="nova_receita">NOVA RECEITA</string>
+    <string name="nova_despesa">NOVA DESPESA</string>
+    <string name="saldo">Saldo:</string>
+    <string name="receitas">Receitas:</string>
+    <string name="despesas">Despesas:</string>
+    <string name="show_saldo_main">TextView</string>
+    <string name="show_despesas_main">TextView</string>
+    <string name="show_receitas_main">TextView</string>
 </resources>
