@@ -13,4 +13,11 @@
     <string name="show_saldo_main">TextView</string>
     <string name="show_despesas_main">TextView</string>
     <string name="show_receitas_main">TextView</string>
+    <string name="escolha_a_data">Escolha a data:</string>
+    <string name="categoria">Categoria:</string>
+    <string name="designacao">Designação:</string>
+    <string name="insira_a_designa_o_da_receita">Insira a designação da receita</string>
+    <string name="valor">Valor:</string>
+    <string name="insira_o_valor_da_receita">Insira o valor da receita</string>
+    <string name="inserir_receita">INSERIR RECEITA</string>
 </resources>
