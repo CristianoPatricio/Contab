@@ -20,6 +20,6 @@ public class DatePickerFragment extends DialogFragment{
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         //Criar uma nova isntância do DatePickerDialog e devolve-o à atividade
-        return new DatePickerDialog(getActivity(), (DatePickerDialog.OnDateSetListener) this, year, month, day);
+        return new DatePickerDialog(getActivity(), (DatePickerDialog.OnDateSetListener) getActivity(), year, month, day);
     }
 }
