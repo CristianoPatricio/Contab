@@ -1,5 +1,6 @@
 package com.cristianodevpro.contab;
 
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
@@ -21,5 +22,18 @@ public class DbTableTipoDespesa implements BaseColumns {
                 ID_DESPESA + " TEXT PRIMARY KEY," +
                 CATEGORIA_DESPESAS + " TEXT NOT NULL)"
         );
+    }
+
+    //CRUD
+    public static ContentValues getContentValues(TipoDespesa tipoDespesa){
+        ContentValues values = new ContentValues();
+        values.put(ID_DESPESA, tipoDespesa.getId_despesa());
+        values.put(CATEGORIA_DESPESAS, tipoDespesa.getCategoria());
+
+        return values;
+    }
+
+    public long insert(ContentValues values) {
+        return db.insert(TABLE_NAME, null, values);
     }
 }
