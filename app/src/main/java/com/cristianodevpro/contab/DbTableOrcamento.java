@@ -1,7 +1,10 @@
 package com.cristianodevpro.contab;
 
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+
+import java.util.Locale;
 
 public class DbTableOrcamento implements BaseColumns {
 
@@ -21,5 +24,19 @@ public class DbTableOrcamento implements BaseColumns {
                 VALOR + " REAL NOT NULL" +
                 ")"
         );
+    }
+
+    //CRUD
+    public static ContentValues getContentValues(Orcamento orcamento){
+        ContentValues values = new ContentValues();
+        values.put(ID_ORCAMENTO, orcamento.getId_orcamento());
+        values.put(VALOR, orcamento.getValor());
+
+        return values;
+    }
+
+    //inserir
+    public long insert(ContentValues values){
+        return db.insert(TABLE_NAME, null, values);
     }
 }
