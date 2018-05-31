@@ -15,46 +15,37 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-public class NovaReceita extends AppCompatActivity{
-
-    Calendar c;
-    DatePickerDialog datePickerDialog;
+public class NovaReceita extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nova_receita);
 
-        final ImageButton datePickerButton = (ImageButton) findViewById(R.id.datePickerButton);
-        final EditText editTextDesignacao = (EditText) findViewById(R.id.editTextDesignacao);
-
-        datePickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //android.support.v4.app.DialogFragment datePicker = new DatePickerFragment();
-                //datePicker.show(getSupportFragmentManager(), "datePicker");
-                c = Calendar.getInstance();
-                int day = c.get(Calendar.DAY_OF_MONTH);
-                int month = c.get(Calendar.MONTH);
-                int year = c.get(Calendar.YEAR);
-
-                datePickerDialog = new DatePickerDialog(NovaReceita.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int Year, int Month, int Day) {
-                            editTextDesignacao.setText(Day + "/" + (Month+1) + "/" + Year);
-                    }
-                }, day, month, year);
-                datePickerDialog.show();
-            }
-        });
     }
 
     public void definirData(View view) {
+        android.support.v4.app.DialogFragment newFragment = new DatePickerFragment();
+        newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
 
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        //Código que obtém a data selecionada pelo utilizador
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+        month++;
+
+        //Atribuir às variáveis dia, mes e ano
+        EditText editTextDesignacao = (EditText) findViewById(R.id.editTextDesignacao);
+
+        editTextDesignacao.setText(""+dayOfMonth+"/"+month+"/"+year);
     }
 
     public void addCategoria(View view) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(NovaReceita.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_inserir_categoria, null);
         final TextInputEditText textInputEditText = (TextInputEditText) findViewById(R.id.textInputCategoriaReceitas);
@@ -78,15 +69,4 @@ public class NovaReceita extends AppCompatActivity{
         dialog.show();
     }
 
-
-
-    /*
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-        //Atribuir às variáveis dia, mes e ano
-    }*/
 }
