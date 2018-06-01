@@ -84,6 +84,20 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return concatDate;
     }
 
+    public void setDefaultDateDb(){
+
+        RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+
+        Calendar c = Calendar.getInstance();
+        int ano = c.get(Calendar.YEAR);
+        int mes = c.get(Calendar.MONTH) + 1;
+        int dia = c.get(Calendar.DAY_OF_MONTH);
+
+        registoMovimentos.setAno(ano);
+        registoMovimentos.setMes(mes);
+        registoMovimentos.setDia(dia);
+    }
+
     public void inserirReceitaDb(View view) {
         //TODO verificar se todos os campos estão preechidos, incluindo a data, que se não for selecionada, será definida a do próprio dia.
         //TODO criar função inserirReceitaDb();
