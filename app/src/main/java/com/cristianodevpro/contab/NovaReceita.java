@@ -1,7 +1,6 @@
 package com.cristianodevpro.contab;
 
 import android.app.DatePickerDialog;
-import android.app.DialogFragment;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Calendar;
+import org.w3c.dom.Text;
 
-public class NovaReceita extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+public class NovaReceita extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, DialogFragmentCategoria.ExampleDialogListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,34 +42,64 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         month++;
 
-        //Atribuir às variáveis dia, mes e ano
-        EditText editTextDesignacao = (EditText) findViewById(R.id.editTextDesignacao);
+        //RegistoMovimentos registo = new RegistoMovimentos();
 
+        //Atribuir às variáveis dia, mes e ano
+        //registo.setDia(dayOfMonth);
+        //registo.setMes(month);
+        //registo.setAno(year);
+
+        //Teste
+        EditText editTextDesignacao = (EditText) findViewById(R.id.editTextDesignacaoReceita);
         editTextDesignacao.setText(""+dayOfMonth+"/"+month+"/"+year);
     }
 
     public void addCategoria(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(NovaReceita.this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_inserir_categoria, null);
-        final TextInputEditText textInputEditText = (TextInputEditText) findViewById(R.id.textInputCategoriaReceitas);
-        final Button buttonInserirCategoriasReceitas = (Button) findViewById(R.id.buttonInserirCategoriaReceitas);
-
-        buttonInserirCategoriasReceitas.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Verificar se o campo está vazio
-                if (!textInputEditText.getText().toString().isEmpty()){
-                    //atribuir à variavel categoriaReceita e inserir na BD
-                    Toast.makeText(NovaReceita.this, "Inserido!", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(NovaReceita.this, "Preencha o campo!", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        builder.setView(mView);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        DialogFragmentCategoria dialogFragmentCategoria = new DialogFragmentCategoria();
+        dialogFragmentCategoria.show(getSupportFragmentManager(), "DialogFragmentCategoria");
     }
 
+    @Override
+    public void setTexts(String categoria) {
+        //Teste
+        EditText editTextDesignacao = (EditText) findViewById(R.id.editTextDesignacaoReceita);
+        editTextDesignacao.setText(""+categoria);
+    }
+
+    public String getNowDate(){
+        //Data e Hora
+        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+        SimpleDateFormat horaFormat = new SimpleDateFormat("HHmmss");
+
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        Date now_date = cal.getTime();
+
+        String dataDb = dateFormat.format(now_date);
+        String horaDb = horaFormat.format(now_date);
+
+        String concatDate = dataDb+horaDb;
+
+        return concatDate;
+    }
+
+    public void inserirReceitaDb(View view) {
+        //TODO verificar se todos os campos estão preechidos, incluindo a data, que se não for selecionada, será definida a do próprio dia.
+        //TODO criar função inserirReceitaDb();
+
+
+        //Teste
+        TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
+        textViewTestDate.setText(""+getNowDate());
+
+        //registo.setId_movimento(dataDb+horaDb);
+        //RegistoMovimentos registo = new RegistoMovimentos();
+        //id_mov = dia + mes + ano + hora + minuto + segundo;
+        //receitadespesa = "Receita";
+        //designacao = editTextDesignacao.getText().toString();
+        //valor = Double.parseDouble(editTextValorReceita.getText());
+        //id_receita = valor do spinner;
+        //registo.RegistoMovimentos(id_mov, dia, mes, ano, receitadespesa, designacao, valor, id_receita, id_despesa);
+    }
 }
