@@ -13,9 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, DialogFragmentOrcamento.ExampleDialogListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +92,24 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_ltodos) {
 
         } else if (id == R.id.nav_orca) {
-
+            DialogFragmentOrcamento dialogFragmentOrcamento = new DialogFragmentOrcamento();
+            dialogFragmentOrcamento.show(getSupportFragmentManager(), "DialogFragmentOrcamento");
         } else if (id == R.id.nav_sobre) {
-
+            Intent i = new Intent(this, Sobre.class);
+            startActivity(i);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    @Override
+    public void setValue(double orcamento) {
+        //Teste
+        TextView textViewShowSaldoMain = (TextView) findViewById(R.id.textViewShowSaldoMain);
+        textViewShowSaldoMain.setText(""+orcamento);
     }
 
     public void novaReceita(View view) {
