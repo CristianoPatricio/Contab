@@ -24,7 +24,24 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".NovaReceita"></activity>
+        <activity
+            android:name=".NovaReceita"
+            android:label="@string/title_activity_nova_receita"
+            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".Sobre"
+            android:label="@string/title_activity_sobre"
+            android:parentActivityName=".MainActivity"
+            />
+        <activity
+            android:name=".NovaDespesa"
+            android:label="@string/title_activity_nova_despesa"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cristianodevpro.contab.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
