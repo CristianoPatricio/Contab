@@ -1,6 +1,7 @@
 package com.cristianodevpro.contab;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -110,10 +111,37 @@ public class MainActivity extends AppCompatActivity
         //Teste
         TextView textViewShowSaldoMain = (TextView) findViewById(R.id.textViewShowSaldoMain);
         textViewShowSaldoMain.setText(""+orcamento);
+
+        //TODO insert orcamento into database
+        //insertOrcamentoDb(orcamento);
+
+
+    }
+
+    private void insertOrcamentoDb(double orcamento) {
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableOrcamento tableOrcamento = new DbTableOrcamento(db);
+
+        Orcamento Orcamento = new Orcamento();
+
+        Orcamento.setValor(orcamento);
+        Orcamento.setId_orcamento(NovaReceita.getNowDate());
+
+        tableOrcamento.insert(DbTableOrcamento.getContentValues(Orcamento));
     }
 
     public void novaReceita(View view) {
         Intent i = new Intent(this, NovaReceita.class);
+        startActivity(i);
+    }
+
+    public void novaDespesa(View view) {
+        Intent i = new Intent(this, NovaDespesa.class);
         startActivity(i);
     }
 }
