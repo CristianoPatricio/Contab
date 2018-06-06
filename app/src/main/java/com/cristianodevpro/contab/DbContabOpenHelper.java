@@ -16,7 +16,17 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //criar tabelas
+        DbTableRegistoMovimentos dbTableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+        dbTableRegistoMovimentos.create();
 
+        DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
+        dbTableTipoDespesa.create();
+
+        DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
+        dbTableTipoReceita.create();
+
+        DbTableOrcamento dbTableOrcamento = new DbTableOrcamento(db);
+        dbTableOrcamento.create();
     }
 
     @Override
