@@ -85,9 +85,52 @@ public class DbContabTests {
 
     }
 
+    @Test
+    public void TipoReceitaCRUDTest(){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableTipoReceita tableTipoReceita = new DbTableTipoReceita(db);
+
+        TipoReceita tipoReceita = new TipoReceita();
+        tipoReceita.setCategoria("Vencimento");
+
+        //Insert/Create (C)RUD
+        long id = tableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
+        assertNotEquals("Erro ao inserir categoria",-1,id); //Se der -1 é porque não foi possível inserir o registo
+
+        //query/Read C/R)UD
+        tipoReceita = ReadFirstTipoReceita(tableTipoReceita,"Vencimento",id);
+
+        //update CR(U)D
+        tipoReceita.setCategoria("Salário");
+
+        int rowsAffected = tableTipoReceita.update(
+                DbTableTipoReceita.getContentValues(tipoReceita),
+                DbTableTipoReceita.ID_RECEITA + "=?",
+                new String[]{Long.toString(id)}
+        );
+        assertEquals("Erro ao atualizar categoria",1,rowsAffected);
+
+        //delete CRU(D)
+        rowsAffected = tableTipoReceita.delete(
+                DbTableTipoReceita.ID_RECEITA+"=?",
+                new String[]{Long.toString(id)}
+        );
+        assertEquals("Erro ao eliminar categoria",1,rowsAffected);
+
+
+        Cursor cursor = tableTipoReceita.query(DbTableTipoReceita.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Categorias encontradas depois de eliminadas...",0,cursor.getCount());
+    }
+
+
     private Orcamento ReadFirstOrcamento(DbTableOrcamento tableOrcamento, double expectedValue, String expectedId) {
         Cursor cursor = tableOrcamento.query(DbTableOrcamento.ALL_COLUMNS, null, null, null, null, null);
-        assertEquals("Erro ao ler orçamento",2,cursor.getColumnCount()); //caso não devolva 1 linha, dá erro
+        assertEquals("Erro ao ler orçamento",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
 
         //Obter o primeiro registo de orçamento
         assertTrue("Erro ao ler o primeiro registo de orçamento",cursor.moveToNext());
@@ -98,5 +141,20 @@ public class DbContabTests {
         assertEquals("Id do orçamento incorreto",expectedId,orcamento.getId_orcamento());
 
         return orcamento;
+    }
+
+    private TipoReceita ReadFirstTipoReceita(DbTableTipoReceita tableTipoReceita, String expectedName, long expectedId) {
+        Cursor cursor = tableTipoReceita.query(DbTableTipoReceita.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Erro ao ler tipo receita",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
+
+        //Obter a primeira categoria de receitas
+        assertTrue("Erro ao ler a categoria da receita",cursor.moveToNext());
+
+        TipoReceita tipoReceita = DbTableTipoReceita.getCurrentTipoReceitaFromCursor(cursor);
+
+        assertEquals("Nome da categoria incorreta",expectedName, tipoReceita.getCategoria());
+        assertEquals("Id do orçamento incorreto",expectedId,tipoReceita.getId_receita());
+
+        return tipoReceita;
     }
 }
