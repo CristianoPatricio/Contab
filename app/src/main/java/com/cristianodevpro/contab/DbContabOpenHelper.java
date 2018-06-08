@@ -30,7 +30,12 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //Remove a BD antiga e cria uma nova
+        db.execSQL("DROP TABLE IF EXISTS " + DbTableOrcamento.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbTableTipoReceita.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbTableTipoDespesa.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbTableRegistoMovimentos.TABLE_NAME);
+        onCreate(db);
     }
 }
