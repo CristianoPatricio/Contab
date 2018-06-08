@@ -1,6 +1,7 @@
 package com.cristianodevpro.contab;
 
 import android.app.DatePickerDialog;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -82,11 +83,30 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoriaDespesa.setAdapter(adapter);
+
+        //TODO insert categoria despesa into database
+        //insertCategoriaDespesaDb(categoria);
     }
 
     public void definirDataDespesa(View view) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    private void insertCategoriaDespesaDb(String categoria) {
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableTipoDespesa tableTipoDespesa = new DbTableTipoDespesa(db);
+
+        TipoDespesa tipoDespesa = new TipoDespesa();
+        tipoDespesa.setCategoria(categoria);
+
+        tableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
+        db.close();
     }
 
 
@@ -134,15 +154,15 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
 
         double valorDespesa = Double.parseDouble(editTextValorDespesa.getText().toString());
         String designacaoDespesa = editTextDesignacaoDespesa.getText().toString();
-        String tipoDespesa = spinnerCategoriaDespesa.getSelectedItem().toString();
+        //String tipoDespesa = spinnerCategoriaDespesa.getSelectedItem().toString();
 
 
         registoMovimentos.setId_movimento(getNowDate());
         registoMovimentos.setReceitadespesa(DESPESA);
         registoMovimentos.setDesignacao(designacaoDespesa);
         registoMovimentos.setValor(valorDespesa);
-        registoMovimentos.setTiporeceita("");
-        registoMovimentos.setTipodespesa(tipoDespesa);
+        //registoMovimentos.setTiporeceita("");
+        //registoMovimentos.setTipodespesa(tipoDespesa);
 
         //Teste
         TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
