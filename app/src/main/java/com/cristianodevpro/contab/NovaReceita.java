@@ -93,7 +93,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoria.setAdapter(adapter);
 
-        //TODO insert categoria into database
+        //TODO insert categoria despesa into database
         //insertCategoriaReceitaDb(categoria);
 
     }
@@ -111,6 +111,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         tipoReceita.setCategoria(categoria);
 
         tableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
+        db.close();
     }
 
 
@@ -170,7 +171,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         double valorReceita = Double.parseDouble(editTextValorReceita.getText().toString());
         String designacaoReceita = editTextDesignacaoReceita.getText().toString();
-        //String tipoReceita = spinnerCategoria.getSelectedItem().toString();
+        String tipoReceita = spinnerCategoria.getSelectedItem().toString();
 
 
         registoMovimentos.setId_movimento(getNowDate());
@@ -178,12 +179,38 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setDesignacao(designacaoReceita);
         registoMovimentos.setValor(valorReceita);
         //registoMovimentos.setTiporeceita(tipoReceita);
-        //registoMovimentos.setTipodespesa("");
+        registoMovimentos.setTipodespesa(Integer.parseInt(null));
 
         //Teste
         TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
         textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
 
         isClicked = false;
+    }
+
+    //TODO create function insertRegistoReceitaDb
+    private void insertRegistoReceitaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+
+        registoMovimentos.setId_movimento(id_movimento);
+        registoMovimentos.setDia(dia);
+        registoMovimentos.setMes(mes);
+        registoMovimentos.setAno(ano);
+        registoMovimentos.setReceitadespesa(receitadespesa);
+        registoMovimentos.setDesignacao(designacao);
+        registoMovimentos.setValor(valor);
+        registoMovimentos.setTiporeceita(tiporeceita);
+        registoMovimentos.setTipodespesa(tipodespesa);
+
+        tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
+        db.close();
     }
 }
