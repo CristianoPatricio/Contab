@@ -170,6 +170,63 @@ public class DbContabTests {
         assertEquals("Categorias encontradas depois de eliminadas...",0,cursor.getCount());
     }
 
+    @Test
+    public void RegistoMovimentosCRUDTest(){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableTipoDespesa tableTipoDespesa = new DbTableTipoDespesa(db);
+        DbTableTipoReceita tableTipoReceita = new DbTableTipoReceita(db);
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        TipoDespesa tipoDespesa = new TipoDespesa();
+        tipoDespesa.setCategoria("Alimentação");
+
+        long idDespesa = tableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
+
+        //Insert/Create (C)RUD
+        RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+        registoMovimentos.setId_movimento("080618113201");
+        registoMovimentos.setDia(8);
+        registoMovimentos.setMes(6);
+        registoMovimentos.setAno(2018);
+        registoMovimentos.setReceitadespesa("Despesa");
+        registoMovimentos.setDesignacao("Almoço cantina");
+        registoMovimentos.setValor(4.8);
+        //registoMovimentos.setTiporeceita(Integer.parseInt("NULL"));
+        registoMovimentos.setTipodespesa((int)idDespesa);
+
+        tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
+        assertNotEquals("Erro ao inserir registo",-1,1); //Se der -1 é porque não foi possível inserir o registo
+
+        //query/Read C/R)UD
+        registoMovimentos = ReadFirstRegisto(tableRegistoMovimentos,"080618113201",8,6,2018,"Despesa","Almoço cantina",4.8,1);
+
+        //update CR(U)D
+        registoMovimentos.setDesignacao("Almoço churrasqueira");
+
+        int rowsAffected = tableRegistoMovimentos.update(
+                DbTableRegistoMovimentos.getContentValues(registoMovimentos),
+                DbTableRegistoMovimentos.ID_MOVIMENTO + "=?",
+                new String[]{"080618113201"}
+        );
+        assertEquals("Erro ao atualizar categoria",1,rowsAffected);
+
+        //delete CRU(D)
+        rowsAffected = tableRegistoMovimentos.delete(
+                DbTableRegistoMovimentos.ID_MOVIMENTO+"=?",
+                new String[]{"080618113201"}
+        );
+        assertEquals("Erro ao eliminar categoria",1,rowsAffected);
+
+
+        Cursor cursor = tableRegistoMovimentos.query(DbTableRegistoMovimentos.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Categorias encontradas depois de eliminadas...",0,cursor.getCount());
+
+    }
 
     private Orcamento ReadFirstOrcamento(DbTableOrcamento tableOrcamento, double expectedValue, String expectedId) {
         Cursor cursor = tableOrcamento.query(DbTableOrcamento.ALL_COLUMNS, null, null, null, null, null);
@@ -214,6 +271,28 @@ public class DbContabTests {
         assertEquals("Id da categoria incorreto",expectedId,tipoDespesa.getId_despesa());
 
         return tipoDespesa;
+    }
+
+    private RegistoMovimentos ReadFirstRegisto(DbTableRegistoMovimentos tableRegistoMovimentos, String expectedId, int expectedDia, int expectedMes, int expectedAno, String expectedRecDes, String expectedDesig, double expectedValor, int expectedTipoDes) {
+        Cursor cursor = tableRegistoMovimentos.query(DbTableRegistoMovimentos.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Erro ao ler tipo receita",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
+
+        //Obter a primeira categoria de receitas
+        assertTrue("Erro ao ler a categoria da receita",cursor.moveToNext());
+
+        RegistoMovimentos registoMovimentos = DbTableRegistoMovimentos.getCurrentTipoDespesaRegistoMovimentoFromCursor(cursor);
+
+        assertEquals("Id registo incorreto",expectedId,registoMovimentos.getId_movimento());
+        assertEquals("Dia registo incorreto",expectedDia,registoMovimentos.getDia());
+        assertEquals("Mes registo incorreto",expectedMes,registoMovimentos.getMes());
+        assertEquals("Ano registo incorreto",expectedAno,registoMovimentos.getAno());
+        assertEquals("ReceitaDespesa registo incorreto",expectedRecDes,registoMovimentos.getReceitadespesa());
+        assertEquals("Designacao registo incorreto",expectedDesig,registoMovimentos.getDesignacao());
+        assertEquals("Valor registo incorreto",expectedValor,registoMovimentos.getValor(), 0.001);
+        //assertEquals("Tipo receita registo incorreto",expectedTipoRec,registoMovimentos.getTiporeceita());
+        assertEquals("Tipo despesa registo incorreto",expectedTipoDes,registoMovimentos.getTipodespesa());
+
+        return registoMovimentos;
     }
 
     private int ReadIdCategoriaReceita(DbTableTipoReceita tableTipoReceita, String categoria, int expectedId){
