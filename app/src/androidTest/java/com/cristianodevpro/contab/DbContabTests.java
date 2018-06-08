@@ -104,6 +104,7 @@ public class DbContabTests {
 
         //query/Read C/R)UD
         tipoReceita = ReadFirstTipoReceita(tableTipoReceita,"Vencimento",id);
+        //int idCat = ReadIdCategoriaReceita(tableTipoReceita, "Vencimento", 2);
 
         //update CR(U)D
         tipoReceita.setCategoria("Salário");
@@ -124,6 +125,48 @@ public class DbContabTests {
 
 
         Cursor cursor = tableTipoReceita.query(DbTableTipoReceita.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Categorias encontradas depois de eliminadas...",0,cursor.getCount());
+    }
+
+    @Test
+    public void TipoDespesaCRUDTest(){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableTipoDespesa tableTipoDespesa = new DbTableTipoDespesa(db);
+
+        TipoDespesa tipoDespesa = new TipoDespesa();
+        tipoDespesa.setCategoria("Compras");
+
+        //Insert/Create (C)RUD
+        long id = tableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
+        assertNotEquals("Erro ao inserir categoria",-1,id); //Se der -1 é porque não foi possível inserir o registo
+
+        //query/Read C/R)UD
+        tipoDespesa = ReadFirstTipoDespesa(tableTipoDespesa,"Compras",id);
+
+        //update CR(U)D
+        tipoDespesa.setCategoria("Alimentação");
+
+        int rowsAffected = tableTipoDespesa.update(
+                DbTableTipoDespesa.getContentValues(tipoDespesa),
+                DbTableTipoDespesa.ID_DESPESA + "=?",
+                new String[]{Long.toString(id)}
+        );
+        assertEquals("Erro ao atualizar categoria",1,rowsAffected);
+
+        //delete CRU(D)
+        rowsAffected = tableTipoDespesa.delete(
+                DbTableTipoDespesa.ID_DESPESA+"=?",
+                new String[]{Long.toString(id)}
+        );
+        assertEquals("Erro ao eliminar categoria",1,rowsAffected);
+
+
+        Cursor cursor = tableTipoDespesa.query(DbTableTipoDespesa.ALL_COLUMNS, null, null, null, null, null);
         assertEquals("Categorias encontradas depois de eliminadas...",0,cursor.getCount());
     }
 
@@ -153,8 +196,33 @@ public class DbContabTests {
         TipoReceita tipoReceita = DbTableTipoReceita.getCurrentTipoReceitaFromCursor(cursor);
 
         assertEquals("Nome da categoria incorreta",expectedName, tipoReceita.getCategoria());
-        assertEquals("Id do orçamento incorreto",expectedId,tipoReceita.getId_receita());
+        assertEquals("Id do categoria incorreto",expectedId,tipoReceita.getId_receita());
 
         return tipoReceita;
+    }
+
+    private TipoDespesa ReadFirstTipoDespesa(DbTableTipoDespesa tableTipoDespesa, String expectedName, long expectedId) {
+        Cursor cursor = tableTipoDespesa.query(DbTableTipoDespesa.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Erro ao ler tipo receita",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
+
+        //Obter a primeira categoria de receitas
+        assertTrue("Erro ao ler a categoria da receita",cursor.moveToNext());
+
+        TipoDespesa tipoDespesa = DbTableTipoDespesa.getCurrentTipoDespesaFromCursor(cursor);
+
+        assertEquals("Nome da categoria incorreta",expectedName, tipoDespesa.getCategoria());
+        assertEquals("Id da categoria incorreto",expectedId,tipoDespesa.getId_despesa());
+
+        return tipoDespesa;
+    }
+
+    private int ReadIdCategoriaReceita(DbTableTipoReceita tableTipoReceita, String categoria, int expectedId){
+        Cursor cursor = tableTipoReceita.query(DbTableTipoReceita.ID_COLUMN,DbTableTipoReceita.CATEGORIA_RECEITA + "= '" + categoria + "'",null, null, null, null);
+
+        int id = DbTableTipoReceita.getIdCategoriaReceita(cursor);
+
+        assertEquals("Id incorreto",expectedId,id);
+
+        return id;
     }
 }
