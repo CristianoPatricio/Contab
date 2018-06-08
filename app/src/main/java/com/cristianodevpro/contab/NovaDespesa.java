@@ -170,4 +170,30 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
 
         isClicked = false;
     }
+
+    //TODO create function insertRegistoReceitaDb
+    private void insertRegistoDespesaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+
+        registoMovimentos.setId_movimento(id_movimento);
+        registoMovimentos.setDia(dia);
+        registoMovimentos.setMes(mes);
+        registoMovimentos.setAno(ano);
+        registoMovimentos.setReceitadespesa(receitadespesa);
+        registoMovimentos.setDesignacao(designacao);
+        registoMovimentos.setValor(valor);
+        registoMovimentos.setTiporeceita(tiporeceita);
+        registoMovimentos.setTipodespesa(tipodespesa);
+
+        tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
+        db.close();
+    }
 }
