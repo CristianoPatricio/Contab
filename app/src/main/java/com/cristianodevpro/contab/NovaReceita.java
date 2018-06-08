@@ -90,12 +90,13 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         try {
             insertCategoriaReceitaDb(categoria);
+            loadSpinnerData();
             Toast.makeText(NovaReceita.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(NovaReceita.this, "Erro ao inserir a categoria na BD!",Toast.LENGTH_LONG).show();
         }
 
-        loadSpinnerData();
+
     }
 
     private void insertCategoriaReceitaDb(String categoria) {
@@ -170,7 +171,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         double valorReceita = Double.parseDouble(editTextValorReceita.getText().toString());
         String designacaoReceita = editTextDesignacaoReceita.getText().toString();
-        String tipoReceita = spinnerCategoria.getSelectedItem().toString();
+        //String tipoReceita = spinnerCategoria.getSelectedItem().toString();
 
 
         registoMovimentos.setId_movimento(getNowDate());
@@ -178,11 +179,10 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setDesignacao(designacaoReceita);
         registoMovimentos.setValor(valorReceita);
         //registoMovimentos.setTiporeceita(tipoReceita);
-        registoMovimentos.setTipodespesa(Integer.parseInt(null));
 
         //Teste
         TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
-        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
+        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor());//+"-"+registoMovimentos.getTiporeceita());
 
         isClicked = false;
 
