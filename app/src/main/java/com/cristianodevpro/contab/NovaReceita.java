@@ -2,6 +2,7 @@ package com.cristianodevpro.contab;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,11 +12,15 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +29,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
     public static final String RECEITA = "Receita";
     private static Boolean isClicked = false;
-    List<String> list = new ArrayList<String>();
+    //List<String> list = new ArrayList<String>();
 
     RegistoMovimentos registoMovimentos = new RegistoMovimentos();
 
@@ -35,15 +40,12 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Colocar elementos predefinidos no spinner
-        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
-        list.add("Depósitos");
-        list.add("Vencimento");
-        list.add("Economias");
+        //Inserir categorias Db
+        insertCategoriaReceitaDb("Depósito");
+        insertCategoriaReceitaDb("Vencimento");
+        insertCategoriaReceitaDb("Economias");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategoria.setAdapter(adapter);
+        loadSpinnerData();
     }
 
     @Override
@@ -85,17 +87,15 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
     @Override
     public void setTexts(String categoria) {
-        //Teste spinner
-        list.add(categoria);
-        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategoria.setAdapter(adapter);
+        try {
+            insertCategoriaReceitaDb(categoria);
+            Toast.makeText(NovaReceita.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(NovaReceita.this, "Erro ao inserir a categoria na BD!",Toast.LENGTH_LONG).show();
+        }
 
-        //TODO insert categoria despesa into database
-        //insertCategoriaReceitaDb(categoria);
-
+        loadSpinnerData();
     }
 
     private void insertCategoriaReceitaDb(String categoria) {
@@ -111,7 +111,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         tipoReceita.setCategoria(categoria);
 
         tableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
-        db.close();
     }
 
 
@@ -186,6 +185,8 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
 
         isClicked = false;
+
+        //insertRegistoReceitaDb();
     }
 
     //TODO create function insertRegistoReceitaDb
@@ -212,5 +213,30 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
         db.close();
+    }
+
+    public ArrayList<String> getCategoriasReceitaFromDb(){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
+
+        Cursor cursor = dbTableTipoReceita.query(DbTableTipoReceita.CATEGORIA_COLUMN, null, null, null, null, null);
+
+        ArrayList<String> list = DbTableTipoReceita.getCategoriasReceitaFromDb(cursor);
+
+        db.close();
+        return list;
+    }
+
+    private void loadSpinnerData(){
+        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getCategoriasReceitaFromDb());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategoria.setAdapter(adapter);
     }
 }
