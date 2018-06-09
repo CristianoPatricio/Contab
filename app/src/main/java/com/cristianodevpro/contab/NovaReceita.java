@@ -29,7 +29,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
     public static final String RECEITA = "Receita";
     private static Boolean isClicked = false;
-    //List<String> list = new ArrayList<String>();
 
     RegistoMovimentos registoMovimentos = new RegistoMovimentos();
 
@@ -40,12 +39,11 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Inserir categorias Db
-        insertCategoriaReceitaDb("Depósito");
-        insertCategoriaReceitaDb("Vencimento");
-        insertCategoriaReceitaDb("Economias");
+        //Apagar todos os registos da tabela TipoReceitas
+        //DbContabOpenHelper db = new DbContabOpenHelper(getApplicationContext());
+        //db.deleteAllCategoriaReceita();
 
-        loadSpinnerData();
+        loadSpinnerData(); //Carrega categorias da DB para spinner
     }
 
     @Override
@@ -55,7 +53,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return super.onOptionsItemSelected(item);
     }
 
-    public void definirData(View view) {
+    public void definirData(View view) { //Botão "definir Data"
         android.support.v4.app.DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
@@ -80,13 +78,13 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         textViewSelectedDate.setText(""+dayOfMonth+"/"+month+"/"+year);
     }
 
-    public void addCategoria(View view) {
+    public void addCategoria(View view) { //Botão "+"
         DialogFragmentCategoria dialogFragmentCategoria = new DialogFragmentCategoria();
         dialogFragmentCategoria.show(getSupportFragmentManager(), "DialogFragmentCategoria");
     }
 
     @Override
-    public void setTexts(String categoria) {
+    public void setTexts(String categoria) { //Ação do botão Inserir Categoria
 
         try {
             insertCategoriaReceitaDb(categoria);
@@ -98,6 +96,48 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
 
     }
+
+    public void inserirReceitaDb(View view) { //Botão "inserir Receita"
+        //Declaração de objetos
+        final EditText editTextDesignacaoReceita = (EditText) findViewById(R.id.editTextDesignacaoReceita);
+        EditText editTextValorReceita = (EditText) findViewById(R.id.editTextValorReceita);
+        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
+
+        //Verificar se o campo valor foi preenchido
+        double valor = 0;
+        try {
+            valor = Double.parseDouble(editTextValorReceita.getText().toString());
+        } catch (NumberFormatException e) {
+            editTextValorReceita.setError("Insira um valor!");
+            editTextValorReceita.requestFocus();
+            return;
+        }
+
+        //Se o botão "definirData" não foi clicado
+        if (!isClicked){
+            setDefaultDateDb();
+        }
+
+        double valorReceita = Double.parseDouble(editTextValorReceita.getText().toString());
+        String designacaoReceita = editTextDesignacaoReceita.getText().toString();
+        int tipoReceita = spinnerCategoria.getSelectedItemPosition()+1;
+
+        registoMovimentos.setId_movimento(getNowDate());
+        registoMovimentos.setReceitadespesa(RECEITA);
+        registoMovimentos.setDesignacao(designacaoReceita);
+        registoMovimentos.setValor(valorReceita);
+        registoMovimentos.setTiporeceita(tipoReceita);
+
+        //Teste
+        TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
+        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
+
+        isClicked = false;
+
+        //insertRegistoReceitaDb();
+    }
+
+    /*****************************Functions and Methods****************************************/
 
     private void insertCategoriaReceitaDb(String categoria) {
         //Abrir BD
@@ -112,6 +152,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         tipoReceita.setCategoria(categoria);
 
         tableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
+        db.close();
     }
 
 
@@ -146,50 +187,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
     }
 
-    public void inserirReceitaDb(View view) {
-
-        //Declaração de objetos
-        final EditText editTextDesignacaoReceita = (EditText) findViewById(R.id.editTextDesignacaoReceita);
-        EditText editTextValorReceita = (EditText) findViewById(R.id.editTextValorReceita);
-        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
-
-        //Verificar se o campo valor foi preenchido
-        double valor = 0;
-        try {
-            valor = Double.parseDouble(editTextValorReceita.getText().toString());
-        } catch (NumberFormatException e) {
-            editTextValorReceita.setError("Insira um valor!");
-            editTextValorReceita.requestFocus();
-            return;
-        }
-
-        //Se o botão "definirData" não foi clicado
-        if (!isClicked){
-            setDefaultDateDb();
-        }
-
-
-        double valorReceita = Double.parseDouble(editTextValorReceita.getText().toString());
-        String designacaoReceita = editTextDesignacaoReceita.getText().toString();
-        //String tipoReceita = spinnerCategoria.getSelectedItem().toString();
-
-
-        registoMovimentos.setId_movimento(getNowDate());
-        registoMovimentos.setReceitadespesa(RECEITA);
-        registoMovimentos.setDesignacao(designacaoReceita);
-        registoMovimentos.setValor(valorReceita);
-        //registoMovimentos.setTiporeceita(tipoReceita);
-
-        //Teste
-        TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
-        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor());//+"-"+registoMovimentos.getTiporeceita());
-
-        isClicked = false;
-
-        //insertRegistoReceitaDb();
-    }
-
-    //TODO create function insertRegistoReceitaDb
     private void insertRegistoReceitaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -218,16 +215,16 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
     public ArrayList<String> getCategoriasReceitaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-
         //Op. escrita
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
 
-        Cursor cursor = dbTableTipoReceita.query(DbTableTipoReceita.CATEGORIA_COLUMN, null, null, null, null, null);
+        Cursor cursor = dbTableTipoReceita.query(DbTableTipoReceita.CATEGORIA_COLUMN, null, null, null, null, DbTableTipoReceita._ID);
 
         ArrayList<String> list = DbTableTipoReceita.getCategoriasReceitaFromDb(cursor);
 
+        cursor.close();
         db.close();
         return list;
     }
@@ -239,4 +236,5 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoria.setAdapter(adapter);
     }
+
 }
