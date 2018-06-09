@@ -27,9 +27,9 @@ import java.util.List;
 
 public class NovaReceita extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, DialogFragmentCategoria.ExampleDialogListener{
 
+    /*************Global Variables********************************************/
     public static final String RECEITA = "Receita";
     private static Boolean isClicked = false;
-
     RegistoMovimentos registoMovimentos = new RegistoMovimentos();
 
     @Override
@@ -45,6 +45,8 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         loadSpinnerData(); //Carrega categorias da DB para spinner
     }
+
+    /************************Handle buttons actions**************************************************/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -118,6 +120,12 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
             setDefaultDateDb();
         }
 
+        //Verificar se o spinner está vaio
+        if (spinnerCategoria.getCount() == 0){
+            Toast.makeText(this, "Por favor, adicione uma categoria!",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         double valorReceita = Double.parseDouble(editTextValorReceita.getText().toString());
         String designacaoReceita = editTextDesignacaoReceita.getText().toString();
         int tipoReceita = spinnerCategoria.getSelectedItemPosition()+1;
@@ -128,7 +136,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setValor(valorReceita);
         registoMovimentos.setTiporeceita(tipoReceita);
 
-        //Teste
+        //Teste (last test: 9jun18: Success!)
         TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
         textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
 
@@ -142,7 +150,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
     private void insertCategoriaReceitaDb(String categoria) {
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-
         //Op. escrita
         SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
@@ -156,7 +163,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
     }
 
 
-    public static String getNowDate(){
+    public static String getNowDate(){ //Data e Hora atuais
         //Data e Hora
         SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
         SimpleDateFormat horaFormat = new SimpleDateFormat("HHmmss");
@@ -174,8 +181,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return concatDate;
     }
 
-    public void setDefaultDateDb(){
-
+    public void setDefaultDateDb(){ //Data atual
         Calendar c = Calendar.getInstance();
         int ano = c.get(Calendar.YEAR);
         int mes = c.get(Calendar.MONTH) + 1;
@@ -184,13 +190,11 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setAno(ano);
         registoMovimentos.setMes(mes);
         registoMovimentos.setDia(dia);
-
     }
 
     private void insertRegistoReceitaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-
         //Op. escrita
         SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
@@ -206,7 +210,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setDesignacao(designacao);
         registoMovimentos.setValor(valor);
         registoMovimentos.setTiporeceita(tiporeceita);
-        registoMovimentos.setTipodespesa(tipodespesa);
 
         tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
         db.close();
