@@ -54,6 +54,18 @@ public class DbTableOrcamento implements BaseColumns {
         return orcamento;
     }
 
+    public static double getValorOrcamentoFromDb(Cursor cursor){ //Obter o ultimo valor de orçamento definido
+        final int posValor = cursor.getColumnIndex(DbTableOrcamento.VALOR);
+
+        double valor = 0;
+        if (cursor.getCount() > 0){ //Encontra pelo menos um registo
+            cursor.moveToFirst();
+            valor = cursor.getDouble(posValor);
+        }
+
+        return valor;
+    }
+
     //create
     public long insert(ContentValues values){
         return db.insert(TABLE_NAME, null, values);
