@@ -54,6 +54,10 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
     public void setTexts(String categoria) { //Ação do botão "addCategoriaDespesa"
 
         try {
+            if (checkCategoriaDespesa(categoria) != -1){ //Se devolver um id != -1 é porque já exite uma categoria com o nome que vamos inserir
+                Toast.makeText(NovaDespesa.this, "Categoria já existente!",Toast.LENGTH_LONG).show();
+                return;
+            }
             insertCategoriaDespesaDb(categoria);
             Toast.makeText(NovaDespesa.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
         } catch (Exception e) {
@@ -227,6 +231,28 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getCategoriasDespesaFromDb());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoriaDespesa.setAdapter(adapter);
+    }
+
+    //Teste
+    public int checkCategoriaDespesa(String categoria){
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        String query = "SELECT "+DbTableTipoDespesa._ID+" FROM "+DbTableTipoDespesa.TABLE_NAME+" WHERE "+DbTableTipoDespesa.CATEGORIA_DESPESAS+" =?";
+        Cursor cursor = db.rawQuery(query,new String[]{categoria});
+
+        int id = -1;
+
+        if (cursor.getCount() > 0){ //Se devolver pelo menos uma linha é porque a categoria já existe.
+            cursor.moveToFirst();
+            id = cursor.getInt(cursor.getColumnIndex(DbTableTipoDespesa._ID));
+        }
+
+        cursor.close();
+        db.close();
+        return id;
     }
 
 
