@@ -89,13 +89,17 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
     public void setTexts(String categoria) { //Ação do botão Inserir Categoria
 
         try {
+            if(checkCategoriaReceita(categoria) != -1) { //Se devolver um id != -1 é porque já exite uma categoria com o nome que vamos inserir
+                Toast.makeText(NovaReceita.this, "Categoria já existente!",Toast.LENGTH_LONG).show();
+                return;
+            }
             insertCategoriaReceitaDb(categoria);
-            loadSpinnerData();
             Toast.makeText(NovaReceita.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(NovaReceita.this, "Erro ao inserir a categoria na BD!",Toast.LENGTH_LONG).show();
         }
 
+        loadSpinnerData(); //atualizar spinner
 
     }
 
@@ -192,7 +196,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setDia(dia);
     }
 
-    private void insertRegistoReceitaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa){
+    private void insertRegistoReceitaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Op. escrita
@@ -238,6 +242,28 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getCategoriasReceitaFromDb());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoria.setAdapter(adapter);
+    }
+
+    //Teste
+    public int checkCategoriaReceita(String categoria){
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        String query = "SELECT "+DbTableTipoReceita._ID+" FROM "+DbTableTipoReceita.TABLE_NAME+" WHERE "+DbTableTipoReceita.CATEGORIA_RECEITA+" =?";
+        Cursor cursor = db.rawQuery(query,new String[]{categoria});
+
+        int id = -1;
+
+        if (cursor.getCount() > 0){ //Se devolver pelo menos uma linha é porque a categoria já existe.
+            cursor.moveToFirst();
+            id = cursor.getInt(cursor.getColumnIndex(DbTableTipoReceita._ID));
+        }
+
+        cursor.close();
+        db.close();
+        return id;
     }
 
 }
