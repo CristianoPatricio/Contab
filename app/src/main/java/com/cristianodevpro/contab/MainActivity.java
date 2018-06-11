@@ -1,6 +1,7 @@
 package com.cristianodevpro.contab;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, DialogFragmentOrcamento.ExampleDialogListener {
@@ -27,6 +33,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        DbContabOpenHelper db = new DbContabOpenHelper(getApplicationContext());
+
         //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //fab.setOnClickListener(new View.OnClickListener() {
             //@Override
@@ -35,6 +43,15 @@ public class MainActivity extends AppCompatActivity
                        // .setAction("Action", null).show();
             //}
       //  });
+
+        //Ler valor do orçamento e apresentá-lo numa textview;
+        TextView textViewShowSaldoMain = findViewById(R.id.textViewShowSaldoMain);
+        double valorOrcamento = getValorOrcamentoFromDb();
+        textViewShowSaldoMain.setText(""+valorOrcamento+"€");
+
+        //Apagar todos os orçamentos
+        //DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //db.deleteAllOrcamento();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -110,29 +127,70 @@ public class MainActivity extends AppCompatActivity
     public void setValue(double orcamento) {
         //Teste
         TextView textViewShowSaldoMain = (TextView) findViewById(R.id.textViewShowSaldoMain);
-        textViewShowSaldoMain.setText(""+orcamento);
+        //textViewShowSaldoMain.setText(""+orcamento);
+        //DbContabOpenHelper db = new DbContabOpenHelper(getApplicationContext());
+        try {
+            insertOrcamentoDb(orcamento); //valor do orçamento é inserido na bd
+            Toast.makeText(MainActivity.this, "Limite de orçamento definido com sucesso!",Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, "Erro ao inserir valor na BD",Toast.LENGTH_LONG).show();
+        }
 
-        //TODO insert orcamento into database
-        //insertOrcamentoDb(orcamento);
-
-
+        //Teste
+        double valorOrcamento = getValorOrcamentoFromDb();
+        textViewShowSaldoMain.setText(""+valorOrcamento+"€");
     }
 
     private void insertOrcamentoDb(double orcamento) {
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-
         //Op. escrita
         SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
         DbTableOrcamento tableOrcamento = new DbTableOrcamento(db);
 
         Orcamento Orcamento = new Orcamento();
-
         Orcamento.setValor(orcamento);
-        Orcamento.setId_orcamento(NovaReceita.getNowDate());
 
         tableOrcamento.insert(DbTableOrcamento.getContentValues(Orcamento));
+        db.close();
+    }
+
+    //Teste
+    public double getValorOrcamentoFromDb(){ //Obter o ultimo valor de orçamento definido
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableOrcamento dbTableOrcamento = new DbTableOrcamento(db);
+
+        Cursor cursor = dbTableOrcamento.query(DbTableOrcamento.VALOR_COLUMN, DbTableOrcamento._ID+"= (SELECT MAX(id_orcamento) FROM Orcamento)", null, null, null, null);
+
+        double valor = 0;
+        valor = DbTableOrcamento.getValorOrcamentoFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return valor;
+    }
+
+    public String getNowDate(){ //Data e Hora atuais
+        //Data e Hora
+        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+        SimpleDateFormat horaFormat = new SimpleDateFormat("HHmmss");
+
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        Date now_date = cal.getTime();
+
+        String dataDb = dateFormat.format(now_date);
+        String horaDb = horaFormat.format(now_date);
+
+        String concatDate = dataDb+horaDb;
+
+        return concatDate;
     }
 
     public void novaReceita(View view) {
