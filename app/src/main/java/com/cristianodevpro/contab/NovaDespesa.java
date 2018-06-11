@@ -1,6 +1,7 @@
 package com.cristianodevpro.contab;
 
 import android.app.DatePickerDialog;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,10 +25,12 @@ import java.util.List;
 
 public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, DialogFragmentCategoria.ExampleDialogListener {
 
+
+    /*************Global Variables********************************************/
     public static final String DESPESA = "Despesa";
     private static Boolean isClicked = false;
-
     RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,80 +39,35 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        loadSpinnerData(); //atualizar spinner
     }
 
-    public String getNowDate(){
-        //Data e Hora
-        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
-        SimpleDateFormat horaFormat = new SimpleDateFormat("HHmmss");
+    /************************Buttons actions**************************************************/
 
-        Date date = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        Date now_date = cal.getTime();
-
-        String dataDb = dateFormat.format(now_date);
-        String horaDb = horaFormat.format(now_date);
-
-        String concatDate = dataDb+horaDb;
-
-        return concatDate;
-    }
-
-    public void setDefaultDateDb(){
-
-        Calendar c = Calendar.getInstance();
-        int ano = c.get(Calendar.YEAR);
-        int mes = c.get(Calendar.MONTH) + 1;
-        int dia = c.get(Calendar.DAY_OF_MONTH);
-
-        registoMovimentos.setAno(ano);
-        registoMovimentos.setMes(mes);
-        registoMovimentos.setDia(dia);
-
-    }
-
-    public void addCategoriaDespesa(View view) {
+    public void addCategoriaDespesa(View view) { //Botão adicionar categoria Despesa
         DialogFragmentCategoria dialogFragmentCategoria = new DialogFragmentCategoria();
         dialogFragmentCategoria.show(getSupportFragmentManager(), "DialogFragmentDespesas");
     }
 
     @Override
-    public void setTexts(String categoria) {
-        //Teste spinner
-        List<String> list = new ArrayList<String>();
-        list.add(categoria);
-        Spinner spinnerCategoriaDespesa = (Spinner) findViewById(R.id.spinnerCategoriaDespesa);
+    public void setTexts(String categoria) { //Ação do botão "addCategoriaDespesa"
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategoriaDespesa.setAdapter(adapter);
+        try {
+            insertCategoriaDespesaDb(categoria);
+            Toast.makeText(NovaDespesa.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(NovaDespesa.this, "Erro ao inserir a categoria na BD!",Toast.LENGTH_LONG).show();
+        }
 
-        //TODO insert categoria despesa into database
-        //insertCategoriaDespesaDb(categoria);
+        loadSpinnerData(); //Atualizar spinner
+
     }
 
-    public void definirDataDespesa(View view) {
+    public void definirDataDespesa(View view) { //Botão "definir data"
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
-
-    private void insertCategoriaDespesaDb(String categoria) {
-        //Abrir BD
-        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-
-        //Op. escrita
-        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
-
-        DbTableTipoDespesa tableTipoDespesa = new DbTableTipoDespesa(db);
-
-        TipoDespesa tipoDespesa = new TipoDespesa();
-        tipoDespesa.setCategoria(categoria);
-
-        tableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
-        db.close();
-    }
-
 
     @Override
     public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
@@ -130,7 +89,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         isClicked = true;
     }
 
-    public void inserirDespesaDb(View view) {
+    public void inserirDespesaDb(View view) { //Botão inserir despesa
         //Declaração de objetos
         final EditText editTextDesignacaoDespesa = (EditText) findViewById(R.id.editTextDesignacaoDespesa);
         EditText editTextValorDespesa = (EditText) findViewById(R.id.editTextValorDespesa);
@@ -151,31 +110,36 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
             setDefaultDateDb();
         }
 
+        //Verificar se o spinner está vaio
+        if (spinnerCategoriaDespesa.getCount() == 0){
+            Toast.makeText(this, "Por favor, adicione uma categoria!",Toast.LENGTH_LONG).show();
+            return;
+        }
 
         double valorDespesa = Double.parseDouble(editTextValorDespesa.getText().toString());
         String designacaoDespesa = editTextDesignacaoDespesa.getText().toString();
-        //String tipoDespesa = spinnerCategoriaDespesa.getSelectedItem().toString();
-
+        int tipoDespesa = spinnerCategoriaDespesa.getSelectedItemPosition()+1;
 
         registoMovimentos.setId_movimento(getNowDate());
         registoMovimentos.setReceitadespesa(DESPESA);
         registoMovimentos.setDesignacao(designacaoDespesa);
         registoMovimentos.setValor(valorDespesa);
-        //registoMovimentos.setTiporeceita("");
-        //registoMovimentos.setTipodespesa(tipoDespesa);
+        registoMovimentos.setTipodespesa(tipoDespesa);
 
         //Teste
         TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
         textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
 
         isClicked = false;
+
+        //insertRegistoDespesaDb();
     }
 
-    //TODO create function insertRegistoReceitaDb
-    private void insertRegistoDespesaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa){
+    /*****************************Functions and Methods****************************************/
+
+    private void insertRegistoDespesaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tipodespesa){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-
         //Op. escrita
         SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
@@ -190,10 +154,81 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setReceitadespesa(receitadespesa);
         registoMovimentos.setDesignacao(designacao);
         registoMovimentos.setValor(valor);
-        registoMovimentos.setTiporeceita(tiporeceita);
         registoMovimentos.setTipodespesa(tipodespesa);
 
         tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
         db.close();
     }
+
+    private void insertCategoriaDespesaDb(String categoria) {
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        DbTableTipoDespesa tableTipoDespesa = new DbTableTipoDespesa(db);
+
+        TipoDespesa tipoDespesa = new TipoDespesa();
+        tipoDespesa.setCategoria(categoria);
+
+        tableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
+        db.close();
+    }
+
+    public void setDefaultDateDb(){
+        Calendar c = Calendar.getInstance();
+        int ano = c.get(Calendar.YEAR);
+        int mes = c.get(Calendar.MONTH) + 1;
+        int dia = c.get(Calendar.DAY_OF_MONTH);
+
+        registoMovimentos.setAno(ano);
+        registoMovimentos.setMes(mes);
+        registoMovimentos.setDia(dia);
+    }
+
+    public String getNowDate(){
+        //Data e Hora
+        SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+        SimpleDateFormat horaFormat = new SimpleDateFormat("HHmmss");
+
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        Date now_date = cal.getTime();
+
+        String dataDb = dateFormat.format(now_date);
+        String horaDb = horaFormat.format(now_date);
+
+        String concatDate = dataDb+horaDb;
+
+        return concatDate;
+    }
+
+    public ArrayList<String> getCategoriasDespesaFromDb(){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
+
+        Cursor cursor = dbTableTipoDespesa.query(DbTableTipoDespesa.CATEGORIA_COLUMN, null, null, null, null, DbTableTipoDespesa._ID);
+
+        ArrayList<String> list = DbTableTipoDespesa.getCategoriasDespesaFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    private void loadSpinnerData(){
+        Spinner spinnerCategoriaDespesa = (Spinner) findViewById(R.id.spinnerCategoriaDespesa);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getCategoriasDespesaFromDb());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategoriaDespesa.setAdapter(adapter);
+    }
+
+
+
 }
