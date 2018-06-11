@@ -5,13 +5,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+
 public class DbTableTipoDespesa implements BaseColumns {
 
     public static final String TABLE_NAME = "TipoDespesa";
-    //public static final int ID_DESPESA = "id_despesa";
+    public static final String _ID = "id_despesa";
     public static final String CATEGORIA_DESPESAS = "categoria";
 
     public static final String[] ALL_COLUMNS = new String[]{_ID, CATEGORIA_DESPESAS};
+    public static final String[] ID_COLUMN = new String[]{_ID};
+    public static final String[] CATEGORIA_COLUMN = new String[]{CATEGORIA_DESPESAS};
+
     private SQLiteDatabase db;
 
     public DbTableTipoDespesa(SQLiteDatabase db) {
@@ -30,7 +35,7 @@ public class DbTableTipoDespesa implements BaseColumns {
     //CRUD
     public static ContentValues getContentValues(TipoDespesa tipoDespesa){
         ContentValues values = new ContentValues();
-        values.put(_ID, tipoDespesa.getId_despesa());
+        //values.put(_ID, tipoDespesa.getId_despesa());
         values.put(CATEGORIA_DESPESAS, tipoDespesa.getCategoria());
 
         return values;
@@ -46,6 +51,20 @@ public class DbTableTipoDespesa implements BaseColumns {
         tipoDespesa.setCategoria(cursor.getString(posCatDes));
 
         return tipoDespesa;
+    }
+
+    public static ArrayList<String> getCategoriasDespesaFromDb(Cursor cursor){
+        final int posCatDes = cursor.getColumnIndex(CATEGORIA_DESPESAS);
+
+        ArrayList<String> list = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            while (cursor.moveToNext()) {
+                list.add(cursor.getString(posCatDes));
+            }
+        }
+
+        return list;
     }
 
     //insert
