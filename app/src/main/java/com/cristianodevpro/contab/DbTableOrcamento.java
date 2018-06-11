@@ -10,11 +10,14 @@ import java.util.Locale;
 
 public class DbTableOrcamento implements BaseColumns {
 
-    public static final String ID_ORCAMENTO = "id_orcamento";
+    public static final String _ID = "id_orcamento";
     public static final String VALOR = "valor";
     public static final String TABLE_NAME = "Orcamento";
 
-    public static final String[] ALL_COLUMNS = new String[]{ID_ORCAMENTO, VALOR};
+    public static final String[] ALL_COLUMNS = new String[]{_ID, VALOR};
+    public static final String[] VALOR_COLUMN = new String[]{VALOR};
+    public static final String[] ID_COLUMN = new String[]{_ID};
+
     private SQLiteDatabase db;
 
     public DbTableOrcamento(SQLiteDatabase db) {
@@ -24,7 +27,7 @@ public class DbTableOrcamento implements BaseColumns {
     //criação da tabela
     public void create() {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
-                ID_ORCAMENTO + " TEXT PRIMARY KEY," +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 VALOR + " REAL NOT NULL" +
                 ")"
         );
@@ -33,19 +36,19 @@ public class DbTableOrcamento implements BaseColumns {
     //CRUD
     public static ContentValues getContentValues(Orcamento orcamento){
         ContentValues values = new ContentValues();
-        values.put(ID_ORCAMENTO, orcamento.getId_orcamento());
+        //values.put(_ID, orcamento.getId_orcamento());
         values.put(VALOR, orcamento.getValor());
 
         return values;
     }
 
     public static Orcamento getCurrentOrcamentoFromCursor(Cursor cursor){
-        final int posId = cursor.getColumnIndex(ID_ORCAMENTO);
+        final int posId = cursor.getColumnIndex(_ID);
         final int posValor = cursor.getColumnIndex(VALOR);
 
         Orcamento orcamento = new Orcamento();
 
-        orcamento.setId_orcamento(cursor.getString(posId));
+        orcamento.setId_orcamento(cursor.getInt(posId));
         orcamento.setValor(cursor.getDouble(posValor));
 
         return orcamento;
