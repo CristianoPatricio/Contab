@@ -98,6 +98,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         final EditText editTextDesignacaoDespesa = (EditText) findViewById(R.id.editTextDesignacaoDespesa);
         EditText editTextValorDespesa = (EditText) findViewById(R.id.editTextValorDespesa);
         Spinner spinnerCategoriaDespesa = (Spinner) findViewById(R.id.spinnerCategoriaDespesa);
+        TextView textViewSelectedDateDespesa = (TextView) findViewById(R.id.textViewSelectedDateDespesa);
 
         //Verificar se o campo valor foi preenchido
         double valor = 0;
@@ -130,6 +131,9 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setValor(valorDespesa);
         registoMovimentos.setTipodespesa(tipoDespesa);
 
+        //Verifica valor da despesa com o valor de orçamento definido
+        checkOrcamento(valorDespesa);
+
         //Teste
         TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
         textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
@@ -137,6 +141,11 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         isClicked = false;
 
         //insertRegistoDespesaDb();
+
+        //Limpa os campos preenchidos
+        editTextDesignacaoDespesa.setText("");
+        editTextValorDespesa.setText("");
+        textViewSelectedDateDespesa.setText("");
     }
 
     /*****************************Functions and Methods****************************************/
@@ -233,8 +242,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         spinnerCategoriaDespesa.setAdapter(adapter);
     }
 
-    //Teste
-    public int checkCategoriaDespesa(String categoria){
+    public int checkCategoriaDespesa(String categoria){//retorna id da categoria
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Escrita
@@ -254,6 +262,35 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         db.close();
         return id;
     }
+
+    public double getValorOrcamentoFromDb(){ //Obter o ultimo valor de orçamento definido
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableOrcamento dbTableOrcamento = new DbTableOrcamento(db);
+
+        Cursor cursor = dbTableOrcamento.query(DbTableOrcamento.VALOR_COLUMN, DbTableOrcamento._ID+"= (SELECT MAX(id_orcamento) FROM Orcamento)", null, null, null, null);
+
+        double valor = 0;
+        valor = DbTableOrcamento.getValorOrcamentoFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return valor;
+    }
+
+    public void checkOrcamento(double valor){ //verifica se a despesa ultrapassa os limites de orçamento definidos
+        double valorAlerta = getValorOrcamentoFromDb() - valor;
+        if(getValorOrcamentoFromDb() < valor){
+            Toast.makeText(this,"A despesa que pretende inserir ultrapassa o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
+        }else if (getValorOrcamentoFromDb() - valor < 50){
+            Toast.makeText(this, "Está a "+valorAlerta+" € de atingir o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
+        }
+    }
+
+
 
 
 
