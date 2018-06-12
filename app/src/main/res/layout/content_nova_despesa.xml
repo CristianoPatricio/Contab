@@ -17,9 +17,11 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="64dp"
+        android:background="@drawable/buttoninserirdespesa_shape"
         android:onClick="inserirDespesaDb"
         android:text="INSERIR DESPESA"
+        android:textColor="@android:color/background_light"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +65,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Insira a designação da despesa "
+        android:hint="Descrição da despesa (opcional)"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -94,23 +96,46 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="72dp"
+        android:background="@drawable/buttonaddcategoriadespesa_shape"
         android:onClick="addCategoriaDespesa"
         android:text="+"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/spinnerCategoriaDespesa"
+        app:layout_constraintStart_toEndOf="@+id/relativeLayout"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/spinnerCategoriaDespesa"
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="187dp"
         android:layout_height="34dp"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:background="@android:color/background_light"
+        android:layout_weight=".28"
+        android:background="@drawable/spinnercategoria_shape"
+        android:orientation="horizontal"
         app:layout_constraintStart_toEndOf="@+id/textView19"
-        app:layout_constraintTop_toBottomOf="@+id/textView18" />
+        app:layout_constraintTop_toBottomOf="@+id/textView18">
+
+        <Spinner
+            android:id="@+id/spinnerCategoriaDespesa"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:spinnerMode="dropdown"/>
+
+        <ImageView
+            android:layout_width="33dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@drawable/drop" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/textView19"
@@ -159,8 +184,8 @@
 
     <ImageButton
         android:id="@+id/datePickerButtonDespesa"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="49dp"
+        android:layout_height="49dp"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -169,4 +194,14 @@
         app:layout_constraintStart_toEndOf="@+id/textView18"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_day" />
+
+    <TextView
+        android:id="@+id/textViewDataReadyInsertDb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>
