@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -135,12 +136,31 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         checkOrcamento(valorDespesa);
 
         //Teste
-        TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
-        textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
+//        TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
+//        textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
 
         isClicked = false;
 
-        //insertRegistoDespesaDb();
+        //insere registo na BD
+        try {
+            insertRegistoDespesaDb(registoMovimentos.getId_movimento(),
+                                    registoMovimentos.getDia(),
+                                    registoMovimentos.getMes(),
+                                    registoMovimentos.getAno(),
+                                    registoMovimentos.getReceitadespesa(),
+                                    registoMovimentos.getDesignacao(),
+                                    registoMovimentos.getValor(),
+                                    registoMovimentos.getTipodespesa()
+            );
+            Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Cancelar", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //operação eliminar registo
+                }
+            }).show();
+        } catch (Exception e) {
+            Snackbar.make(view,"Erro ao inserir registo na BD!",Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        }
 
         //Limpa os campos preenchidos
         editTextDesignacaoDespesa.setText("");
@@ -283,6 +303,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
 
     public void checkOrcamento(double valor){ //verifica se a despesa ultrapassa os limites de orçamento definidos
         double valorAlerta = getValorOrcamentoFromDb() - valor;
+        new DecimalFormat("0.00").format(valorAlerta);
         if(getValorOrcamentoFromDb() < valor){
             Toast.makeText(this,"A despesa que pretende inserir ultrapassa o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
         }else if (getValorOrcamentoFromDb() - valor < 50){
