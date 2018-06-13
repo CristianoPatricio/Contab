@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -44,6 +45,16 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         //db.deleteAllCategoriaReceita();
 
         loadSpinnerData(); //Carrega categorias da DB para spinner
+    }
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
     }
 
     /************************Handle buttons actions**************************************************/
@@ -108,6 +119,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         final EditText editTextDesignacaoReceita = (EditText) findViewById(R.id.editTextDesignacaoReceita);
         EditText editTextValorReceita = (EditText) findViewById(R.id.editTextValorReceita);
         Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
+        TextView textViewSelectedDateReceita = (TextView) findViewById(R.id.textViewSelectedDate);
 
         //Verificar se o campo valor foi preenchido
         double valor = 0;
@@ -141,12 +153,36 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setTiporeceita(tipoReceita);
 
         //Teste (last test: 9jun18: Success!)
-        TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
-        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
+//        TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
+//        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
 
         isClicked = false;
 
-        //insertRegistoReceitaDb();
+        //inserir registo na BD
+        try {
+            insertRegistoReceitaDb(registoMovimentos.getId_movimento(),
+                                    registoMovimentos.getDia(),
+                                    registoMovimentos.getMes(),
+                                    registoMovimentos.getAno(),
+                                    registoMovimentos.getReceitadespesa(),
+                                    registoMovimentos.getDesignacao(),
+                                    registoMovimentos.getValor(),
+                                    registoMovimentos.getTiporeceita()
+            );
+            Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Cancelar", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //operação eliminar registo
+                }
+            }).show();
+        } catch (Exception e) {
+            Snackbar.make(view,"Erro ao inserir registo na BD!",Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        }
+
+        //Limpa os campos preenchidos
+        editTextDesignacaoReceita.setText("");
+        editTextValorReceita.setText("");
+        textViewSelectedDateReceita.setText("");
     }
 
     /*****************************Functions and Methods****************************************/
