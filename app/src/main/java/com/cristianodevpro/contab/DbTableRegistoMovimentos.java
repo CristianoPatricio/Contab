@@ -140,6 +140,18 @@ public class DbTableRegistoMovimentos implements BaseColumns {
         return valorReceitas;
     }
 
+    public static double getSaldoFromDb(Cursor cursor){
+        final int posValor = 0; //select SUM(valor) -> coluna 0
+
+        double saldo = 0;
+        if (cursor.getCount() > 0){ //Encontra um registo
+            cursor.moveToFirst();
+            saldo = cursor.getDouble(posValor);
+        }
+
+        return saldo;
+    }
+
     //insert
     public long insert (ContentValues values){
         return db.insert(TABLE_NAME, null, values);
