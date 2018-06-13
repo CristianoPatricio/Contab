@@ -1,5 +1,6 @@
 package com.cristianodevpro.contab;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,10 +46,23 @@ public class MainActivity extends AppCompatActivity
             //}
       //  });
 
-        //Ler valor do orçamento e apresentá-lo numa textview;
+        //Ler saldo e apresentá-lo numa text view
         TextView textViewShowSaldoMain = findViewById(R.id.textViewShowSaldoMain);
-        double valorOrcamento = getValorOrcamentoFromDb();
-        textViewShowSaldoMain.setText(""+valorOrcamento+"€");
+        double saldo = getSaldoFromDb();
+        new DecimalFormat("0.00").format(saldo);
+        textViewShowSaldoMain.setText(""+saldo+"€");
+
+        //Ler valor das despesas e apresentá-las numa textview
+        TextView textViewShowDespesasMain = findViewById(R.id.textViewShowDespesasMain);
+        double valorDespesas = getValorDespesaFromDb();
+        new DecimalFormat("0.00").format(valorDespesas);
+        textViewShowDespesasMain.setText(""+valorDespesas+"€");
+
+        //Ler valor das receitas e apresentá-las numa textview
+        TextView textViewShowReceitasMain = (TextView) findViewById(R.id.textViewShowReceitasMain);
+        double valorReceitas = getValorReceitaFromDb();
+        new DecimalFormat("0.00").format(valorReceitas);
+        textViewShowReceitasMain.setText(""+valorReceitas+"€");
 
         //Apagar todos os orçamentos
         //DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -62,6 +77,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+
+    /************************Buttons actions**************************************************/
 
     @Override
     public void onBackPressed() {
@@ -89,7 +107,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent i = new Intent(this, Definicoes.class);
+            startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);
@@ -124,11 +143,9 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void setValue(double orcamento) {
+    public void setValue(double orcamento) { //Ação do botão "DEFINIR ORÇAMENTO" do dialog fragment
         //Teste
         TextView textViewShowSaldoMain = (TextView) findViewById(R.id.textViewShowSaldoMain);
-        //textViewShowSaldoMain.setText(""+orcamento);
-        //DbContabOpenHelper db = new DbContabOpenHelper(getApplicationContext());
         try {
             insertOrcamentoDb(orcamento); //valor do orçamento é inserido na bd
             Toast.makeText(MainActivity.this, "Limite de orçamento definido com sucesso!",Toast.LENGTH_LONG).show();
@@ -140,6 +157,18 @@ public class MainActivity extends AppCompatActivity
         double valorOrcamento = getValorOrcamentoFromDb();
         textViewShowSaldoMain.setText(""+valorOrcamento+"€");
     }
+
+    public void novaReceita(View view) { //Botão "NOVA RECEITA"
+        Intent i = new Intent(this, NovaReceita.class);
+        startActivity(i);
+    }
+
+    public void novaDespesa(View view) { //Botão "NOVA DESPESA"
+        Intent i = new Intent(this, NovaDespesa.class);
+        startActivity(i);
+    }
+
+    /*****************************Functions and Methods****************************************/
 
     private void insertOrcamentoDb(double orcamento) {
         //Abrir BD
@@ -175,6 +204,60 @@ public class MainActivity extends AppCompatActivity
         return valor;
     }
 
+    public double getValorDespesaFromDb(){ //Obter somatório dos valores das despesas
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        Cursor cursor = tableRegistoMovimentos.query(DbTableRegistoMovimentos.VALOR_COLUMN," receitadespesa = 'Despesa'",null,null,null,null);
+
+        double valor = 0;
+        valor = DbTableRegistoMovimentos.getValorDespesasFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return  valor;
+    }
+
+    public double getValorReceitaFromDb(){ //Obter o somatório do valor das receitas
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"},DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Receita"},null, null, null);
+
+        double valorReceita = 0;
+        valorReceita = DbTableRegistoMovimentos.getValorReceitasFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return valorReceita;
+    }
+
+    public double getSaldoFromDb(){ //Obter o saldo da BD
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+") - (SELECT SUM("+DbTableRegistoMovimentos.VALOR+") FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.RECEITADESPESA+"= 'Despesa')"},DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Receita"},null,null,null);
+
+        double saldo = 0;
+        saldo = DbTableRegistoMovimentos.getSaldoFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return saldo;
+    }
+
     public String getNowDate(){ //Data e Hora atuais
         //Data e Hora
         SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
@@ -191,15 +274,5 @@ public class MainActivity extends AppCompatActivity
         String concatDate = dataDb+horaDb;
 
         return concatDate;
-    }
-
-    public void novaReceita(View view) {
-        Intent i = new Intent(this, NovaReceita.class);
-        startActivity(i);
-    }
-
-    public void novaDespesa(View view) {
-        Intent i = new Intent(this, NovaDespesa.class);
-        startActivity(i);
     }
 }
