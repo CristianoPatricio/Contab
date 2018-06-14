@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.DatabaseMetaData;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,6 +28,9 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, DialogFragmentOrcamento.ExampleDialogListener {
+
+    /*****************************Global Variables*****************************/
+    private static Boolean isClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +48,14 @@ public class MainActivity extends AppCompatActivity
                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                        // .setAction("Action", null).show();
             //}
-      //  });
+        //  });
+
+        //Apagar todos os registos de movimentos
+        //db.deleteAllRegistosMovimentos();
 
         //Ler saldo e apresentá-lo numa text view
         TextView textViewShowSaldoMain = findViewById(R.id.textViewShowSaldoMain);
-        double saldo = getSaldoFromDb();
+        double saldo = getValorReceitaFromDb()-getValorDespesaFromDb();
         new DecimalFormat("0.00").format(saldo);
         textViewShowSaldoMain.setText(""+saldo+"€");
 
@@ -63,6 +70,35 @@ public class MainActivity extends AppCompatActivity
         double valorReceitas = getValorReceitaFromDb();
         new DecimalFormat("0.00").format(valorReceitas);
         textViewShowReceitasMain.setText(""+valorReceitas+"€");
+
+        if(isClicked) {
+            TextView textViewShowDiaMesAno = (TextView) findViewById(R.id.textViewShowDiaMesAno);
+
+            double valorReceitasTipo = getValorReceitaTipoFromDb(DadosDefinicoesToMain.getTipo());
+           // double valorDespesasTipo = getValorDespesaTipoFromDb(DadosDefinicoesToMain.getTipo());
+           // double saldoTipo = valorReceitasTipo-valorDespesasTipo;
+            new DecimalFormat("0.00").format(valorReceitasTipo);
+            textViewShowReceitasMain.setText(""+valorReceitasTipo+"€");
+           // textViewShowDespesasMain.setText(""+valorDespesasTipo+"€");
+            // textViewShowSaldoMain.setText(""+valorSaldoTipo+"€");
+
+            switch (DadosDefinicoesToMain.getTipo()){
+                case "dia":
+                    textViewShowDiaMesAno.setText(""+DadosDefinicoesToMain.getDia()+"/"+DadosDefinicoesToMain.getMes()+"/"+DadosDefinicoesToMain.getAno());
+                    break;
+                case "mes":
+                    textViewShowDiaMesAno.setText(""+DadosDefinicoesToMain.getMes()+"/"+DadosDefinicoesToMain.getAno());
+                    break;
+                case "ano":
+                    textViewShowDiaMesAno.setText("Ano "+DadosDefinicoesToMain.getAno());
+                    break;
+                default:
+                    textViewShowDiaMesAno.setText("Geral");
+            }
+
+            Toast.makeText(MainActivity.this, "Dados passados: "+DadosDefinicoesToMain.getDia()+" "+DadosDefinicoesToMain.getMes()+" "+DadosDefinicoesToMain.getAno()+" "+DadosDefinicoesToMain.getTipo(),Toast.LENGTH_LONG).show();
+        }
+
 
         //Apagar todos os orçamentos
         //DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -79,10 +115,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    /************************Buttons actions**************************************************/
+    /*******************************************Buttons actions**************************************************/
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed() { //botão back
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -109,6 +145,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             Intent i = new Intent(this, Definicoes.class);
             startActivity(i);
+            isClicked = true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -121,13 +158,13 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_ldia) {
-            // Handle the camera action
+            Toast.makeText(MainActivity.this, "Em desenvolvimento...",Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_lmes) {
-
+            Toast.makeText(MainActivity.this, "Em desenvolvimento...",Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_lano) {
-
+            Toast.makeText(MainActivity.this, "Em desenvolvimento...",Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_ltodos) {
-
+            Toast.makeText(MainActivity.this, "Em desenvolvimento...",Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_orca) {
             DialogFragmentOrcamento dialogFragmentOrcamento = new DialogFragmentOrcamento();
             dialogFragmentOrcamento.show(getSupportFragmentManager(), "DialogFragmentOrcamento");
@@ -141,7 +178,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
     @Override
     public void setValue(double orcamento) { //Ação do botão "DEFINIR ORÇAMENTO" do dialog fragment
         //Teste
@@ -154,8 +190,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         //Teste
-        double valorOrcamento = getValorOrcamentoFromDb();
-        textViewShowSaldoMain.setText(""+valorOrcamento+"€");
+//        double valorOrcamento = getValorOrcamentoFromDb();
+////        textViewShowSaldoMain.setText(""+valorOrcamento+"€");
     }
 
     public void novaReceita(View view) { //Botão "NOVA RECEITA"
@@ -212,7 +248,7 @@ public class MainActivity extends AppCompatActivity
 
         DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
 
-        Cursor cursor = tableRegistoMovimentos.query(DbTableRegistoMovimentos.VALOR_COLUMN," receitadespesa = 'Despesa'",null,null,null,null);
+        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"},DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Despesa"},null,null,null);
 
         double valor = 0;
         valor = DbTableRegistoMovimentos.getValorDespesasFromDb(cursor);
@@ -230,7 +266,7 @@ public class MainActivity extends AppCompatActivity
 
         DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
 
-        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"},DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Receita"},null, null, null);
+        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Receita"},null, null, null);
 
         double valorReceita = 0;
         valorReceita = DbTableRegistoMovimentos.getValorReceitasFromDb(cursor);
@@ -240,6 +276,35 @@ public class MainActivity extends AppCompatActivity
         return valorReceita;
     }
 
+    public double getValorReceitaTipoFromDb(String tipo){ //Obter o somatório do valor das receitas por tipo
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        Cursor cursor = null;
+
+        if (tipo.equals("ano")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.ANO+" =?",new String[]{"Receita",Integer.toString(DadosDefinicoesToMain.getAno())},null, null, null);
+        }else if(tipo.equals("dia")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.DIA+" =? AND "+DbTableRegistoMovimentos.MES+" =? AND "+DbTableRegistoMovimentos.ANO+" =?",new String[]{"Receita",Integer.toString(DadosDefinicoesToMain.getDia()),Integer.toString(DadosDefinicoesToMain.getMes()),Integer.toString(DadosDefinicoesToMain.getAno())},null, null, null);
+        }else if (tipo.equals("mes")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.MES+" =? AND "+DbTableRegistoMovimentos.ANO+" =?",new String[]{"Receita",Integer.toString(DadosDefinicoesToMain.getMes()),Integer.toString(DadosDefinicoesToMain.getAno())},null, null, null);
+        }else if (tipo.equals("todos")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Receita"},null, null, null);
+        }
+
+        double valorReceita = 0;
+        valorReceita = DbTableRegistoMovimentos.getValorReceitasFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return valorReceita;
+    }
+
+    //Testes
     public double getSaldoFromDb(){ //Obter o saldo da BD
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
