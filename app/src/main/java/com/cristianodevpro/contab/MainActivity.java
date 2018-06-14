@@ -29,8 +29,10 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, DialogFragmentOrcamento.ExampleDialogListener {
 
+
     /*****************************Global Variables*****************************/
     private static Boolean isClicked = false;
+    private static final String DESPESA = "Despesa";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity
             TextView textViewShowDiaMesAno = (TextView) findViewById(R.id.textViewShowDiaMesAno);
 
             double valorReceitasTipo = getValorReceitaTipoFromDb(DadosDefinicoesToMain.getTipo());
-           // double valorDespesasTipo = getValorDespesaTipoFromDb(DadosDefinicoesToMain.getTipo());
+            //double valorDespesasTipo = getValorDespesaTipoFromDb(DadosDefinicoesToMain.getTipo());
            // double saldoTipo = valorReceitasTipo-valorDespesasTipo;
             new DecimalFormat("0.00").format(valorReceitasTipo);
             textViewShowReceitasMain.setText(""+valorReceitasTipo+"€");
@@ -302,6 +304,34 @@ public class MainActivity extends AppCompatActivity
         cursor.close();
         db.close();
         return valorReceita;
+    }
+
+    public double getValorDespesaTipoFromDb(String tipo){ //Obter o somatório do valor das despesas por tipo
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        Cursor cursor = null;
+
+        if (tipo.equals("ano")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.ANO+" =?",new String[]{DESPESA,Integer.toString(DadosDefinicoesToMain.getAno())},null, null, null);
+        }else if(tipo.equals("dia")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.DIA+" =? AND "+DbTableRegistoMovimentos.MES+" =? AND "+DbTableRegistoMovimentos.ANO+" =?",new String[]{DESPESA,Integer.toString(DadosDefinicoesToMain.getDia()),Integer.toString(DadosDefinicoesToMain.getMes()),Integer.toString(DadosDefinicoesToMain.getAno())},null, null, null);
+        }else if (tipo.equals("mes")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.MES+" =? AND "+DbTableRegistoMovimentos.ANO+" =?",new String[]{DESPESA,Integer.toString(DadosDefinicoesToMain.getMes()),Integer.toString(DadosDefinicoesToMain.getAno())},null, null, null);
+        }else if (tipo.equals("todos")){
+            cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"}, DbTableRegistoMovimentos.RECEITADESPESA+" =?",new String[]{"Receita"},null, null, null);
+        }
+
+        double valorDespesa = 0;
+        valorDespesa = DbTableRegistoMovimentos.getValorDespesasFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return valorDespesa;
     }
 
     //Testes
