@@ -172,7 +172,11 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
             Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Cancelar", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //operação eliminar registo
+                    try {
+                        deleteRegisto(registoMovimentos.getId_movimento());
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(),"Erro ao eliminar registo...", Toast.LENGTH_LONG).show();
+                    }
                 }
             }).show();
         } catch (Exception e) {
@@ -280,7 +284,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         spinnerCategoria.setAdapter(adapter);
     }
 
-    //Teste
     public int checkCategoriaReceita(String categoria){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -300,6 +303,18 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         cursor.close();
         db.close();
         return id;
+    }
+
+    private void deleteRegisto(String id){
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+        tableRegistoMovimentos.delete(DbTableRegistoMovimentos._ID+"=?",new String[]{id});
+
+        db.close();
     }
 
 }
