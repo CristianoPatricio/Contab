@@ -1,6 +1,7 @@
 package com.cristianodevpro.contab;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
     public static final String DESPESA = "Despesa";
     private static Boolean isClicked = false;
     RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+    private static Boolean valorLimite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,16 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         loadSpinnerData(); //atualizar spinner
+    }
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
     }
 
     /************************Buttons actions**************************************************/
@@ -133,7 +145,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setTipodespesa(tipoDespesa);
 
         //Verifica valor da despesa com o valor de orçamento definido
-        checkOrcamento(valorDespesa);
+        if (!valorLimite) checkOrcamento(valorDespesa);
 
         //Teste
 //        TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
@@ -155,7 +167,11 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
             Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Cancelar", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //operação eliminar registo
+                    try {
+                        deleteRegisto(registoMovimentos.getId_movimento());
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(),"Erro ao eliminar registo...", Toast.LENGTH_LONG).show();
+                    }
                 }
             }).show();
         } catch (Exception e) {
@@ -166,6 +182,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         editTextDesignacaoDespesa.setText("");
         editTextValorDespesa.setText("");
         textViewSelectedDateDespesa.setText("");
+
     }
 
     /*****************************Functions and Methods****************************************/
@@ -305,14 +322,26 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         double valorAlerta = getValorOrcamentoFromDb() - valor;
         new DecimalFormat("0.00").format(valorAlerta);
         if(getValorOrcamentoFromDb() < valor){
-            Toast.makeText(this,"A despesa que pretende inserir ultrapassa o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
-        }else if (getValorOrcamentoFromDb() - valor < 50){
+            Toast.makeText(this,"A despesa que inseriu ultrapassou o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
+            valorLimite = true;
+        }else if (valorAlerta < 50 && valorAlerta != 0){
             Toast.makeText(this, "Está a "+valorAlerta+" € de atingir o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
+        }else if (valorAlerta == 0){
+            Toast.makeText(this,"Atingiu o limite de orçamento mensal!",Toast.LENGTH_LONG).show();
+            valorLimite = true;
         }
     }
 
+    private void deleteRegisto(String id){
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+        tableRegistoMovimentos.delete(DbTableRegistoMovimentos._ID+"=?",new String[]{id});
 
-
+        db.close();
+    }
 
 }
