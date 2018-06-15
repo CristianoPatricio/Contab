@@ -1,5 +1,6 @@
 package com.cristianodevpro.contab;
 
+import android.content.CursorLoader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -28,8 +30,17 @@ public class GerirCategorias extends AppCompatActivity {
 
         listViewReceitas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO implementar código para eliminar categoria selecionada
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String categoria = adapterView.getItemAtPosition(position).toString();
+                int id = getIdCategoriaReceita(categoria);
+                //TODO acrescentar dialog de confirmação
+                try {
+                    deleteCategoriaReceita(id); //elimina categoria receita
+                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
+                }
+                updateListCategoriasReceitas(); //atualiza lista
             }
         });
 
@@ -40,14 +51,23 @@ public class GerirCategorias extends AppCompatActivity {
 
         listViewDespesas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO implementar código para eliminar categoria selecionada
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String categoria = adapterView.getItemAtPosition(position).toString();
+                int id = getIdCategoriaDespesa(categoria);
+                //TODO acrescentar dialog de confirmação
+                try {
+                    deleteCategoriaDespesa(id); //elimina categoria despesa
+                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
+                }
+                updateListCategoriasDespesas(); //atualiza lista
             }
         });
     }
 
     /**********************************Functions and Methods***************************************/
-    public ArrayList<String> getCategoriasReceitaFromDb(){
+    private ArrayList<String> getCategoriasReceitaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Op. escrita
@@ -64,7 +84,7 @@ public class GerirCategorias extends AppCompatActivity {
         return list;
     }
 
-    public ArrayList<String> getCategoriasDespesaFromDb(){
+    private ArrayList<String> getCategoriasDespesaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Op. escrita
@@ -79,5 +99,77 @@ public class GerirCategorias extends AppCompatActivity {
         cursor.close();
         db.close();
         return list;
+    }
+
+    private int getIdCategoriaReceita(String categoria){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
+
+        Cursor cursor = dbTableTipoReceita.query(DbTableTipoReceita.ID_COLUMN,DbTableTipoReceita.CATEGORIA_RECEITA+"=?",new String[]{categoria},null,null,null);
+
+        int id = DbTableTipoReceita.getIdCategoriaReceita(cursor);
+
+        cursor.close();
+        db.close();
+        return id;
+    }
+
+    private int getIdCategoriaDespesa(String categoria){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
+
+        Cursor cursor = dbTableTipoDespesa.query(DbTableTipoDespesa.ID_COLUMN,DbTableTipoDespesa.CATEGORIA_DESPESAS+"=?",new String[]{categoria},null,null,null);
+
+        int id = DbTableTipoDespesa.getIdCategoriaDespesa(cursor);
+
+        cursor.close();
+        db.close();
+        return id;
+    }
+
+    private void deleteCategoriaReceita(int id){
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
+        dbTableTipoReceita.delete(DbTableTipoReceita._ID+"=?",new String[]{Integer.toString(id)});
+
+        db.close();
+    }
+
+    private void deleteCategoriaDespesa(int id){
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
+        dbTableTipoDespesa.delete(DbTableTipoDespesa._ID+"=?",new String[]{Integer.toString(id)});
+
+        db.close();
+    }
+
+    private void updateListCategoriasReceitas(){
+        //ListView Categorias Receitas
+        ListAdapter listAdapterReceitas = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,getCategoriasReceitaFromDb());
+        ListView listViewReceitas = (ListView) findViewById(R.id.listViewReceitas);
+        listViewReceitas.setAdapter(listAdapterReceitas);
+    }
+
+    private void updateListCategoriasDespesas(){
+        //ListView Categorias Despesas
+        ListAdapter listAdapterDespesas = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,getCategoriasDespesaFromDb());
+        ListView listViewDespesas = (ListView) findViewById(R.id.listViewDespesas);
+        listViewDespesas.setAdapter(listAdapterDespesas);
     }
 }
