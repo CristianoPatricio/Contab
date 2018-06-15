@@ -1,8 +1,10 @@
 package com.cristianodevpro.contab;
 
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,15 +34,32 @@ public class GerirCategorias extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 String categoria = adapterView.getItemAtPosition(position).toString();
-                int id = getIdCategoriaReceita(categoria);
-                //TODO acrescentar dialog de confirmação
-                try {
-                    deleteCategoriaReceita(id); //elimina categoria receita
-                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
-                }
-                updateListCategoriasReceitas(); //atualiza lista
+                final int id = getIdCategoriaReceita(categoria);
+                //Dialog de confirmação
+                /****************************************************************************************/
+                AlertDialog.Builder builder = new AlertDialog.Builder(GerirCategorias.this);
+                builder.setTitle("Eliminar categoria \""+categoria+"\"")
+                        .setMessage("Tem a certeza?")
+                        .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                try {
+                                    deleteCategoriaReceita(id); //elimina categoria receita
+                                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e) {
+                                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
+                                }
+                                updateListCategoriasReceitas(); //atualiza lista
+                            }
+                        })
+                        .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel(); //cancela a operação
+                            }
+                        })
+                        .show();
+                /**************************************************************************************/
             }
         });
 
@@ -53,15 +72,32 @@ public class GerirCategorias extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 String categoria = adapterView.getItemAtPosition(position).toString();
-                int id = getIdCategoriaDespesa(categoria);
-                //TODO acrescentar dialog de confirmação
-                try {
-                    deleteCategoriaDespesa(id); //elimina categoria despesa
-                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
-                }
-                updateListCategoriasDespesas(); //atualiza lista
+                final int id = getIdCategoriaDespesa(categoria);
+                //Dialog de confirmação
+                /****************************************************************************************/
+                AlertDialog.Builder builder = new AlertDialog.Builder(GerirCategorias.this);
+                builder.setTitle("Eliminar categoria \""+categoria+"\"")
+                        .setMessage("Tem a certeza?")
+                        .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                try {
+                                    deleteCategoriaDespesa(id); //elimina categoria despesa
+                                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
+                                } catch (Exception e) {
+                                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
+                                }
+                                updateListCategoriasDespesas(); //atualiza lista
+                            }
+                        })
+                        .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel(); //cancela a operação
+                            }
+                        })
+                        .show();
+                /**************************************************************************************/
             }
         });
     }
