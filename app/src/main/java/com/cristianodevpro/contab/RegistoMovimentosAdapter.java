@@ -4,13 +4,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovimentosAdapter.ViewHolder> {
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder{ //representa um item dentro da recycler view
+
+        public TextView textViewDesignacao;
+        public TextView textViewData;
+        public TextView textViewCategoria;
+        public TextView textViewTipo;
+        public TextView textViewValor;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            textViewDesignacao = (TextView) itemView.findViewById(R.id.textViewDesignacao);
+            textViewData = (TextView) itemView.findViewById(R.id.textViewData);
+            textViewCategoria = (TextView) itemView.findViewById(R.id.textViewCategoria);
+            textViewTipo = (TextView) itemView.findViewById(R.id.textViewTipo);
+            textViewValor = (TextView) itemView.findViewById(R.id.textViewValor);
         }
     }
 
