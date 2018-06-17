@@ -115,7 +115,19 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
                 builder.setNeutralButton("Eliminar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO interface eliminar
+                        DbContabOpenHelper db = new DbContabOpenHelper(context);
+
+                        try {
+                            db.deleteRegistoMovimento(registoMovimentos.getId_movimento());
+                            Toast.makeText(context,"Registo eliminado com sucesso!"+position,Toast.LENGTH_LONG).show();
+                            registoMovimentosList.remove(position); //remover o item da lista
+                            //recyclerView.removeViewAt(position); //remover o item da recycler view
+                            //notifyItemRemoved(position); //notificar de que foi eliminado um item
+                            notifyItemRangeChanged(position, registoMovimentosList.size()); //alterar tamanho da lista
+                            notifyDataSetChanged(); //notificar de que foram dados alterados
+                        } catch (Exception e) {
+                            Toast.makeText(context,"Erro ao eliminar registo!"+position,Toast.LENGTH_LONG).show();
+                        }
 
                     }
                 });
