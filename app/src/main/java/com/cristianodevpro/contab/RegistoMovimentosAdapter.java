@@ -1,7 +1,11 @@
 package com.cristianodevpro.contab;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -43,25 +48,31 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(context);
 
         public void setRegistoMovimento(RegistoMovimentos registoMovimento) {
-            String catDespesa = dbContabOpenHelper.getTipoDespesaByID(registoMovimento.getTipodespesa());
-            String catReceita = dbContabOpenHelper.getTipoReceitaByID(registoMovimento.getTiporeceita());
+            int idDespesa = registoMovimento.getTipodespesa();
+            int idReceita = registoMovimento.getTiporeceita();
+            String catDespesa = dbContabOpenHelper.getTipoDespesaByID(idDespesa);
+            String catReceita = dbContabOpenHelper.getTipoReceitaByID(idReceita);
 
-            if (registoMovimento.getDesignacao().equals("")) {
-                textViewDesignacao.setText(""+catDespesa);
-                //textViewDesignacao.setText(""+catReceita);
+            if (registoMovimento.getDesignacao().equals("")) { //caso a designacao não exista, colocar a categoria
+                if(!catDespesa.equals("")) {
+                    textViewDesignacao.setText("" + catDespesa);
+                }else {
+                    textViewDesignacao.setText("" + catReceita);
+                }
             }else{
                 textViewDesignacao.setText("" + registoMovimento.getDesignacao());
             }
+
             textViewCategoriaDespesa.setText(""+catDespesa);
             textViewCategoriaReceita.setText(""+catReceita);
             textViewData.setText(""+registoMovimento.getDia()+"/"+registoMovimento.getMes()+"/"+registoMovimento.getAno());
             textViewTipo.setText(""+registoMovimento.getReceitadespesa());
 
             if(registoMovimento.getReceitadespesa().equals("Despesa")) {
-                textViewValor.setText("-" + registoMovimento.getValor() + "€");
+                textViewValor.setText("-" +String.format("%.2f",registoMovimento.getValor()) + "€");
                 textViewValor.setTextColor(Color.parseColor("#ff384c"));
             }else{
-                textViewValor.setText(""+registoMovimento.getValor()+"€");
+                textViewValor.setText(""+String.format("%.2f",registoMovimento.getValor())+"€");
                 textViewValor.setTextColor(Color.parseColor("#93D67C"));
             }
         }
@@ -82,11 +93,44 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
 
 
     @Override
-    public void onBindViewHolder(RegistoViewHolder holder, int position) {
+    public void onBindViewHolder(final RegistoViewHolder holder, final int position) {
         //get element from dataset at this position
         final RegistoMovimentos registoMovimentos = registoMovimentosList.get(position);
         holder.setRegistoMovimento(registoMovimentos);
+
+        //listen to single view click
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Escolha uma opção");
+                builder.setMessage("Atualizar ou eliminar registo?");
+                builder.setPositiveButton("Atualizar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //TODO interface atualizar
+
+                    }
+                });
+                builder.setNeutralButton("Eliminar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //TODO interface eliminar
+
+                    }
+                });
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Cancelar
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.create().show();
+            }
+        });
     }
+
 
     /**
      * Returns the total number of items in the data set held by the adapter.
@@ -97,4 +141,5 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
     public int getItemCount() {
         return registoMovimentosList.size();
     }
+
 }
