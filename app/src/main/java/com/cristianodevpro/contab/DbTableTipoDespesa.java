@@ -53,15 +53,26 @@ public class DbTableTipoDespesa implements BaseColumns {
         return tipoDespesa;
     }
 
+    public static int getIdCategoriaDespesa(Cursor cursor){
+        final int posId = cursor.getColumnIndex(_ID);
+
+        int id = 0;
+        if (cursor.moveToFirst()) {
+            id = cursor.getInt(posId);
+        }
+
+        return id;
+    }
+
     public static ArrayList<String> getCategoriasDespesaFromDb(Cursor cursor){
         final int posCatDes = cursor.getColumnIndex(CATEGORIA_DESPESAS);
 
         ArrayList<String> list = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
+            do {
                 list.add(cursor.getString(posCatDes));
-            }
+            }while (cursor.moveToNext());
         }
 
         return list;
