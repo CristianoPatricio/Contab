@@ -25,6 +25,7 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
     private Context context;
     private RecyclerView recyclerView;
     private Cursor cursor = null;
+    private DbContabOpenHelper dbContabOpenHelper;
 
     public class RegistoViewHolder extends RecyclerView.ViewHolder{ //representa um item dentro da recycler view
 
@@ -108,8 +109,7 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
                 builder.setPositiveButton("Atualizar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO interface atualizar
-
+                        goToUpdateActivity(registoMovimentos.getId_movimento());
                     }
                 });
                 builder.setNeutralButton("Eliminar", new DialogInterface.OnClickListener() {
@@ -126,7 +126,7 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
                             notifyItemRangeChanged(position, registoMovimentosList.size()); //alterar tamanho da lista
                             notifyDataSetChanged(); //notificar de que foram dados alterados
                         } catch (Exception e) {
-                            Toast.makeText(context,"Erro ao eliminar registo!"+position,Toast.LENGTH_LONG).show();
+                            Toast.makeText(context,"Erro ao eliminar registo!",Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -144,6 +144,19 @@ public class RegistoMovimentosAdapter extends RecyclerView.Adapter<RegistoMovime
     }
 
 
+    private void goToUpdateActivity(String id_registo){
+        dbContabOpenHelper = new DbContabOpenHelper(context);
+        String tipo = dbContabOpenHelper.checkReceitaDespesa(id_registo);
+        if (tipo.equals("Receita")){ //Ir para atividade Edit Receita
+            Intent i = new Intent(context, NovaReceita.class);
+            i.putExtra("ID",id_registo);
+            context.startActivity(i);
+        }else{ //Ir para a atividade Edit Despesa
+            Intent i = new Intent(context, NovaDespesa.class);
+            i.putExtra("ID",id_registo);
+            context.startActivity(i);
+        }
+    }
     /**
      * Returns the total number of items in the data set held by the adapter.
      *
