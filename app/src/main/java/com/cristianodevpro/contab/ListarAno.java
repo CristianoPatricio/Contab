@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,14 +78,18 @@ public class ListarAno extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 int ano = Integer.parseInt(spinnerAnoListar.getSelectedItem().toString());
 
-                DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-                adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosAno(ano), getApplicationContext(), recyclerViewListarAno);
+                DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(ListarAno.this);
+                adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosAno(ano), ListarAno.this, recyclerViewListarAno);
+
+                if (dbContabOpenHelper.getListRegistoMovimentosAno(ano).size()==0){ //se não devolver registos
+                    Toast.makeText(getApplicationContext(),"Não foram encontrados registos para o ano de "+ano, Toast.LENGTH_LONG).show();
+                }
 
                 recyclerViewListarAno = (RecyclerView) findViewById(R.id.recyclerViewListarAno);
-                final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+                final LinearLayoutManager layoutManager = new LinearLayoutManager(ListarAno.this);
                 recyclerViewListarAno.setLayoutManager(layoutManager);
                 recyclerViewListarAno.setItemAnimator(new DefaultItemAnimator());
-                recyclerViewListarAno.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
+                recyclerViewListarAno.addItemDecoration(new DividerItemDecoration(ListarAno.this, LinearLayoutManager.VERTICAL));
                 recyclerViewListarAno.setAdapter(adapter);
             }
 
