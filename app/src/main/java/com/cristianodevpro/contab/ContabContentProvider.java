@@ -122,7 +122,26 @@ public class ContabContentProvider extends ContentProvider {
      */
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        UriMatcher matcher = getContabUriMatcher();
+
+        String id = uri.getLastPathSegment();
+
+        int rows = 0;
+
+        switch (matcher.match(uri)){
+            case CATEGORIAS_RECEITAS_ID:
+                rows = new DbTableTipoReceita(db).delete(DbTableTipoReceita._ID+"=?",new String[]{id});
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Invalid URI: "+uri);
+        }
+
+        if (rows > 0) notifyChanges(uri);
+
+        return rows;
     }
 
     /**
