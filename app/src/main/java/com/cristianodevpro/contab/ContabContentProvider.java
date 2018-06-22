@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -78,13 +79,38 @@ public class ContabContentProvider extends ContentProvider {
     /**
      *
      * @param uri
-     * @param contentValues
+     * @param values
      * @return
      */
     @Nullable
     @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        UriMatcher matcher = getContabUriMatcher();
+
+        long id = -1;
+
+        switch (matcher.match(uri)){
+            case CATEGORIAS_RECEITAS:
+                id = new DbTableTipoReceita(db).insert(values);
+                break;
+
+                default:
+                    throw new UnsupportedOperationException("Invalid URI: "+uri);
+        }
+
+        if (id > 0){ //foram inseridos registos
+            notifyChanges(uri);
+            return Uri.withAppendedPath(uri,Long.toString(id));
+        }else{
+            throw new SQLException("Não foi possível inserir o registo");
+        }
+
+    }
+
+    private void notifyChanges(@NonNull Uri uri) {
+        getContext().getContentResolver().notifyChange(uri,null);
     }
 
     /**
