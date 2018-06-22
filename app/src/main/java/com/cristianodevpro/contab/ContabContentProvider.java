@@ -8,12 +8,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public class ContabContentProvider extends ContentProvider {
+    DbContabOpenHelper dbContabOpenHelper;
     /**
      * @return
      */
     @Override
     public boolean onCreate() {
-        return false;
+        dbContabOpenHelper = new DbContabOpenHelper(getContext());
+        return true;
     }
 
     /**
