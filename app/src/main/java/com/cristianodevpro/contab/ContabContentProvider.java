@@ -128,13 +128,32 @@ public class ContabContentProvider extends ContentProvider {
     /**
      *
      * @param uri
-     * @param contentValues
+     * @param values
      * @param s
      * @param strings
      * @return
      */
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String s, @Nullable String[] strings) {
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
+
+        UriMatcher matcher = getContabUriMatcher();
+
+        String id = uri.getLastPathSegment();
+
+        int rows = 0;
+
+        switch (matcher.match(uri)){
+            case CATEGORIAS_RECEITAS_ID:
+                rows = new DbTableTipoReceita(db).update(values,DbTableTipoReceita._ID+"=?",new String[]{id});
+                break;
+
+                default:
+                    throw new UnsupportedOperationException("Invalid URI: "+uri);
+        }
+
+        if (rows > 0) notifyChanges(uri);
+
+        return rows;
     }
 }
