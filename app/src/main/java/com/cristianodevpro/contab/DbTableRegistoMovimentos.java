@@ -6,6 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class DbTableRegistoMovimentos implements BaseColumns {
 
     public static final String TABLE_NAME = "RegistoMovimentos";
@@ -113,19 +117,15 @@ public class DbTableRegistoMovimentos implements BaseColumns {
     }
 
     public static double getValorDespesasFromDb(Cursor cursor){ //Obter o valor das despesas
-       final int posValor = cursor.getColumnIndex("valor");
+        final int posValor = 0; //select SUM(valor) -> coluna 0
 
-        double totalDespesas = 0;
-        double valor = 0;
-        if (cursor.getCount() > 0){ //Encontra pelo menos um registo
+        double valorDespesas = 0;
+        if (cursor.getCount() > 0){ //Encontra pelo um registo
             cursor.moveToFirst();
-            while (cursor.moveToNext()) {
-                valor = cursor.getDouble(posValor);
-                totalDespesas = totalDespesas + valor;
-            }
+            valorDespesas = cursor.getDouble(posValor);
         }
 
-        return totalDespesas;
+        return valorDespesas;
     }
 
     public static double getValorReceitasFromDb(Cursor cursor){
@@ -151,6 +151,7 @@ public class DbTableRegistoMovimentos implements BaseColumns {
 
         return saldo;
     }
+
 
     //insert
     public long insert (ContentValues values){
