@@ -47,11 +47,11 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         //Inserir categorias predefinidas para as receitas
         TipoReceita tipoReceita = new TipoReceita();
         tipoReceita.setCategoria("Vencimento");
+        dbTableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
 
-        tipoReceita = new TipoReceita();
         tipoReceita.setCategoria("Depósito");
+        dbTableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
 
-        tipoReceita = new TipoReceita();
         tipoReceita.setCategoria("Prémios");
         dbTableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
     }
@@ -62,37 +62,36 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
 
         TipoDespesa tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Alimentação");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Café");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Carro");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Casa");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Comida");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Telecomunicações");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Contas");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Entretenimento");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Presentes");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Saúde");
+        dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
 
-        tipoDespesa = new TipoDespesa();
         tipoDespesa.setCategoria("Roupas");
-
         dbTableTipoDespesa.insert(DbTableTipoDespesa.getContentValues(tipoDespesa));
     }
 
@@ -229,6 +228,133 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return registosLinkedList;
     }
 
+    public List<RegistoMovimentos> getListRegistoMovimentosAno(int ano){
+
+        String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.ANO+"=?";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{Integer.toString(ano)});
+
+        List<RegistoMovimentos> registosLinkedList = new LinkedList<>();
+        RegistoMovimentos registoMovimentos;
+
+        if (cursor.moveToFirst()){
+            do{
+                registoMovimentos = new RegistoMovimentos();
+
+                registoMovimentos.setId_movimento(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos._ID)));
+                registoMovimentos.setDia(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.DIA)));
+                registoMovimentos.setMes(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.MES)));
+                registoMovimentos.setAno(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.ANO)));
+                registoMovimentos.setReceitadespesa(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.RECEITADESPESA)));
+                registoMovimentos.setDesignacao(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.DESGINACAO)));
+                registoMovimentos.setValor(cursor.getDouble(cursor.getColumnIndex(DbTableRegistoMovimentos.VALOR)));
+                registoMovimentos.setTiporeceita(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_RECEITA)));
+                registoMovimentos.setTipodespesa(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_DESPESA)));
+
+                registosLinkedList.add(registoMovimentos);
+            }while(cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return registosLinkedList;
+    }
+
+    public List<RegistoMovimentos> getListRegistoMovimentosMes(int mes, int ano){
+
+        String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.ANO+"=?"+" AND "+DbTableRegistoMovimentos.MES+"=?";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{Integer.toString(ano),Integer.toString(mes)});
+
+        List<RegistoMovimentos> registosLinkedList = new LinkedList<>();
+        RegistoMovimentos registoMovimentos;
+
+        if (cursor.moveToFirst()){
+            do{
+                registoMovimentos = new RegistoMovimentos();
+
+                registoMovimentos.setId_movimento(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos._ID)));
+                registoMovimentos.setDia(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.DIA)));
+                registoMovimentos.setMes(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.MES)));
+                registoMovimentos.setAno(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.ANO)));
+                registoMovimentos.setReceitadespesa(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.RECEITADESPESA)));
+                registoMovimentos.setDesignacao(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.DESGINACAO)));
+                registoMovimentos.setValor(cursor.getDouble(cursor.getColumnIndex(DbTableRegistoMovimentos.VALOR)));
+                registoMovimentos.setTiporeceita(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_RECEITA)));
+                registoMovimentos.setTipodespesa(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_DESPESA)));
+
+                registosLinkedList.add(registoMovimentos);
+            }while(cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return registosLinkedList;
+    }
+
+    public List<RegistoMovimentos> getListRegistoMovimentosDia(int dia, int mes, int ano){
+
+        String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.ANO+"=? AND "+DbTableRegistoMovimentos.MES+"=? AND "+DbTableRegistoMovimentos.DIA+"=?";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{Integer.toString(ano),Integer.toString(mes),Integer.toString(dia)});
+
+        List<RegistoMovimentos> registosLinkedList = new LinkedList<>();
+        RegistoMovimentos registoMovimentos;
+
+        if (cursor.moveToFirst()){
+            do{
+                registoMovimentos = new RegistoMovimentos();
+
+                registoMovimentos.setId_movimento(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos._ID)));
+                registoMovimentos.setDia(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.DIA)));
+                registoMovimentos.setMes(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.MES)));
+                registoMovimentos.setAno(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.ANO)));
+                registoMovimentos.setReceitadespesa(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.RECEITADESPESA)));
+                registoMovimentos.setDesignacao(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.DESGINACAO)));
+                registoMovimentos.setValor(cursor.getDouble(cursor.getColumnIndex(DbTableRegistoMovimentos.VALOR)));
+                registoMovimentos.setTiporeceita(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_RECEITA)));
+                registoMovimentos.setTipodespesa(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_DESPESA)));
+
+                registosLinkedList.add(registoMovimentos);
+            }while(cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return registosLinkedList;
+    }
+
+    public RegistoMovimentos getRegistoFromRecycler(String id){
+        String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos._ID+"=?";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{id});
+
+        RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+        if (cursor.getCount() > 0){
+            cursor.moveToFirst();
+            registoMovimentos.setDia(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.DIA)));
+            registoMovimentos.setMes(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.MES)));
+            registoMovimentos.setAno(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.ANO)));
+            registoMovimentos.setReceitadespesa(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.RECEITADESPESA)));
+            registoMovimentos.setDesignacao(cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.DESGINACAO)));
+            registoMovimentos.setValor(cursor.getDouble(cursor.getColumnIndex(DbTableRegistoMovimentos.VALOR)));
+            registoMovimentos.setTiporeceita(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_RECEITA)));
+            registoMovimentos.setTipodespesa(cursor.getInt(cursor.getColumnIndex(DbTableRegistoMovimentos.FK_ID_DESPESA)));
+        }
+
+        cursor.close();
+        db.close();
+
+        return registoMovimentos;
+    }
+
 
     public String getTipoDespesaByID(int id){
         String query = "SELECT "+DbTableTipoDespesa.CATEGORIA_DESPESAS+" FROM "+DbTableTipoDespesa.TABLE_NAME+" WHERE "+DbTableTipoDespesa._ID+"=?";
@@ -283,6 +409,37 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         db.close();
 
         return tipoReceita;
+    }
+
+    public void deleteRegistoMovimento(String id){
+        //Escrita
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        DbTableRegistoMovimentos dbTableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        dbTableRegistoMovimentos.delete(DbTableRegistoMovimentos._ID+"=?",new String[]{id});
+
+        db.close();
+    }
+
+    public String checkReceitaDespesa(String id){
+        //Leitura
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT "+DbTableRegistoMovimentos.RECEITADESPESA+" FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos._ID+" =?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{id});
+
+        String tipo = "";
+        if (cursor.getCount() > 0){
+            cursor.moveToFirst();
+            tipo = cursor.getString(cursor.getColumnIndex(DbTableRegistoMovimentos.RECEITADESPESA));
+        }
+
+        cursor.close();
+        db.close();
+
+        return tipo;
     }
 
 
