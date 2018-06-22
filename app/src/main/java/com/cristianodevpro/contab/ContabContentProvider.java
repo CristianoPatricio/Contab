@@ -12,16 +12,21 @@ import android.support.annotation.Nullable;
 
 public class ContabContentProvider extends ContentProvider {
 
+    public static final String AUTHORITY = "com.cristianodevpro.contab";
+
     private static final int CATEGORIAS_RECEITAS = 200;
     private static final int CATEGORIAS_RECEITAS_ID = 201;
+
+    private static final String MULTIPLE_ITEMS = "vdn.android.cursor.dir";
+    private static final String SINGLE_ITEM = "vnd.android.cursor.item";
 
     DbContabOpenHelper dbContabOpenHelper;
 
     private static UriMatcher getContabUriMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-        uriMatcher.addURI("com.cristianodevpro.contab", "categorias_receitas", CATEGORIAS_RECEITAS);
-        uriMatcher.addURI("com.cristianodevpro.contab", "categorias_receitas/#", CATEGORIAS_RECEITAS_ID);
+        uriMatcher.addURI(AUTHORITY, "categorias_receitas", CATEGORIAS_RECEITAS);
+        uriMatcher.addURI(AUTHORITY, "categorias_receitas/#", CATEGORIAS_RECEITAS_ID);
 
         return uriMatcher;
     }
@@ -73,7 +78,18 @@ public class ContabContentProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        UriMatcher matcher = getContabUriMatcher();
+
+        switch (matcher.match(uri)){
+            case CATEGORIAS_RECEITAS:
+                return MULTIPLE_ITEMS+"/"+AUTHORITY+"/"+DbTableTipoReceita.TABLE_NAME;
+
+            case CATEGORIAS_RECEITAS_ID:
+                return SINGLE_ITEM+"/"+AUTHORITY+"/"+DbTableTipoReceita.TABLE_NAME;
+
+                default:
+                    throw new UnsupportedOperationException("Unknown URI: "+uri);
+        }
     }
 
     /**
