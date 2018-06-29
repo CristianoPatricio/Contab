@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,7 +19,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,12 +42,14 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nova_despesa);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         loadSpinnerData(); //atualizar spinner
+
+        setDefaultDateToTextView();
     }
 
     /**
@@ -52,8 +58,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
      */
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        finish();
     }
 
     /************************Buttons actions**************************************************/
@@ -61,6 +66,11 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
     public void addCategoriaDespesa(View view) { //Botão adicionar categoria Despesa
         DialogFragmentCategoria dialogFragmentCategoria = new DialogFragmentCategoria();
         dialogFragmentCategoria.show(getSupportFragmentManager(), "DialogFragmentDespesas");
+    }
+
+
+    public void cancel(View view) { //Botão "cancelar"
+        finish();
     }
 
     @Override
@@ -123,6 +133,12 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
             return;
         }
 
+        if (valor == 0) {
+            editTextValorDespesa.setError("Insira um valor maior que 0");
+            editTextValorDespesa.requestFocus();
+            return;
+        }
+
         //Se o botão "definirData" não foi clicado
         if (!isClicked){
             setDefaultDateDb();
@@ -136,22 +152,32 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
 
         double valorDespesa = Double.parseDouble(editTextValorDespesa.getText().toString());
         String designacaoDespesa = editTextDesignacaoDespesa.getText().toString();
-        int tipoDespesa = spinnerCategoriaDespesa.getSelectedItemPosition()+1;
+        String tipoDespesa = spinnerCategoriaDespesa.getSelectedItem().toString().trim();
+        int idTipoDespesa = getIdCategoriaDespesa(tipoDespesa);
 
         registoMovimentos.setId_movimento(getNowDate());
         registoMovimentos.setReceitadespesa(DESPESA);
         registoMovimentos.setDesignacao(designacaoDespesa);
         registoMovimentos.setValor(valorDespesa);
-        registoMovimentos.setTipodespesa(tipoDespesa);
+        registoMovimentos.setTipodespesa(idTipoDespesa);
 
         //Verifica valor da despesa com o valor de orçamento definido
-        if (!valorLimite) checkOrcamento(valorDespesa);
+//        double valorOrcamento = getValorOrcamentoFromDb();
+//        if (!valorLimite && valorOrcamento != 0) checkOrcamento(valorDespesa);
 
         //Teste
 //        TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
 //        textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
 
         isClicked = false;
+
+        try {
+            if (!checkDataBeforeInsert(registoMovimentos.getDia(),registoMovimentos.getMes(),registoMovimentos.getAno())){
+                return;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         //insere registo na BD
         try {
@@ -164,16 +190,19 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
                                     registoMovimentos.getValor(),
                                     registoMovimentos.getTipodespesa()
             );
-            Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Cancelar", new View.OnClickListener() {
+            Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Anular", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
                         deleteRegisto(registoMovimentos.getId_movimento());
+                        Toast.makeText(getApplicationContext(),"Registo eliminado com sucesso!", Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
                         Toast.makeText(getApplicationContext(),"Erro ao eliminar registo...", Toast.LENGTH_LONG).show();
                     }
                 }
-            }).show();
+            });
+            snackbar.setActionTextColor(Color.RED);
+            snackbar.show();
         } catch (Exception e) {
             Snackbar.make(view,"Erro ao inserir registo na BD!",Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
@@ -184,6 +213,8 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         textViewSelectedDateDespesa.setText("");
 
     }
+
+
 
     /*****************************Functions and Methods****************************************/
 
@@ -234,6 +265,24 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setAno(ano);
         registoMovimentos.setMes(mes);
         registoMovimentos.setDia(dia);
+    }
+
+    private int getCurrentDay(){ //Data atual
+        Calendar c = Calendar.getInstance();
+        int dia = c.get(Calendar.DAY_OF_MONTH);
+        return dia;
+    }
+
+    public int getCurrentMonth(){
+        Calendar c = Calendar.getInstance();
+        int month = c.get(Calendar.MONTH)+1;
+        return month;
+    }
+
+    private int getCurrentYear(){ //Data atual
+        Calendar c = Calendar.getInstance();
+        int ano = c.get(Calendar.YEAR);
+        return ano;
     }
 
     public String getNowDate(){
@@ -318,14 +367,32 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         return valor;
     }
 
+    private double getValorDespesaMesFromDb(int mes){ //Obter somatório dos valores das despesas
+        //Abrir a BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
+
+        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"},DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.MES+" =?",new String[]{"Despesa", Integer.toString(mes)},null,null,null);
+
+        double valor = 0;
+        valor = DbTableRegistoMovimentos.getValorDespesasFromDb(cursor);
+
+        cursor.close();
+        db.close();
+        return  valor;
+    }
+
     public void checkOrcamento(double valor){ //verifica se a despesa ultrapassa os limites de orçamento definidos
-        double valorAlerta = getValorOrcamentoFromDb() - valor;
-        new DecimalFormat("0.00").format(valorAlerta);
-        if(getValorOrcamentoFromDb() < valor){
+        double currentMonth = getCurrentMonth();
+        double valorAlerta = getValorOrcamentoFromDb() - (valor + getValorDespesaMesFromDb((int) currentMonth));
+        if(getValorOrcamentoFromDb() < (valor+getValorDespesaMesFromDb((int) currentMonth))){
             Toast.makeText(this,"A despesa que inseriu ultrapassou o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
             valorLimite = true;
         }else if (valorAlerta < 50 && valorAlerta != 0){
-            Toast.makeText(this, "Está a "+valorAlerta+" € de atingir o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Está a "+String.format("%.2f",valorAlerta)+" € de atingir o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
         }else if (valorAlerta == 0){
             Toast.makeText(this,"Atingiu o limite de orçamento mensal!",Toast.LENGTH_LONG).show();
             valorLimite = true;
@@ -342,6 +409,58 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
         tableRegistoMovimentos.delete(DbTableRegistoMovimentos._ID+"=?",new String[]{id});
 
         db.close();
+    }
+
+    private int getIdCategoriaDespesa(String categoria){
+        //Abrir BD
+        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        //Op. escrita
+        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+
+        DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
+
+        Cursor cursor = dbTableTipoDespesa.query(DbTableTipoDespesa.ID_COLUMN,DbTableTipoDespesa.CATEGORIA_DESPESAS+"=?",new String[]{categoria},null,null,null);
+
+        int id = DbTableTipoDespesa.getIdCategoriaDespesa(cursor);
+
+        cursor.close();
+        db.close();
+        return id;
+    }
+
+    private void goToMainActivity(double valor){
+        Intent i = new Intent(this, MainActivity.class);
+        i.putExtra("valor", valor);
+        this.startActivity(i);
+    }
+
+    private void setDefaultDateToTextView(){
+        TextView textViewDate = (TextView) findViewById(R.id.textViewSelectedDateDespesa);
+
+        int dia = getCurrentDay();
+        int mes = getCurrentMonth();
+        int ano = getCurrentYear();
+
+        textViewDate.setText(""+dia+"/"+mes+"/"+ano);
+    }
+
+    private Boolean checkDataBeforeInsert(int dia, int mes, int ano) throws ParseException { //comparar data selecionada com data atual
+        boolean insert = true;
+        int diaAtual = getCurrentDay();
+        int mesAtual = getCurrentMonth();
+        int anoAtual = getCurrentYear();
+
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+        Date atualDate = format.parse(diaAtual+"-"+mesAtual+"-"+anoAtual);
+        Date selectDate = format.parse(dia+"-"+mes+"-"+ano);
+
+        if (atualDate.compareTo(selectDate) <= 0) {
+            Toast.makeText(getApplicationContext(), "Não pode inserir registos para datas futuras!", Toast.LENGTH_LONG).show();
+            insert = false;
+        }
+
+        return insert;
     }
 
 }
