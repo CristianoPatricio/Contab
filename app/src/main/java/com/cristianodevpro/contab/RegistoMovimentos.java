@@ -1,15 +1,19 @@
 package com.cristianodevpro.contab;
 
+import java.util.Date;
+
 public class RegistoMovimentos {
 
-    String id_movimento, receitadespesa, designacao, tiporeceita, tipodespesa;
+    String id_movimento, receitadespesa, designacao;
+    int tiporeceita, tipodespesa;
     int dia, mes, ano;
+    Date data;
     double valor;
 
     //Construtores
     public RegistoMovimentos() {}
 
-    public RegistoMovimentos(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, String tiporeceita, String tipodespesa) {
+    public void RegistoMovimentos(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita, int tipodespesa) {
         this.id_movimento = id_movimento;
         this.dia = dia;
         this.mes = mes;
@@ -47,19 +51,19 @@ public class RegistoMovimentos {
         this.designacao = designacao;
     }
 
-    public String getTiporeceita() {
+    public int getTiporeceita() {
         return tiporeceita;
     }
 
-    public void setTiporeceita(String tiporeceita) {
+    public void setTiporeceita(int tiporeceita) {
         this.tiporeceita = tiporeceita;
     }
 
-    public String getTipodespesa() {
+    public int getTipodespesa() {
         return tipodespesa;
     }
 
-    public void setTipodespesa(String tipodespesa) {
+    public void setTipodespesa(int tipodespesa) {
         this.tipodespesa = tipodespesa;
     }
 
