@@ -36,7 +36,6 @@ public class DbTableOrcamento implements BaseColumns {
     //CRUD
     public static ContentValues getContentValues(Orcamento orcamento){
         ContentValues values = new ContentValues();
-        //values.put(_ID, orcamento.getId_orcamento());
         values.put(VALOR, orcamento.getValor());
 
         return values;
@@ -58,7 +57,7 @@ public class DbTableOrcamento implements BaseColumns {
         final int posValor = cursor.getColumnIndex(DbTableOrcamento.VALOR);
 
         double valor = 0;
-        if (cursor.getCount() > 0){ //Encontra pelo menos um registo
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             valor = cursor.getDouble(posValor);
         }
