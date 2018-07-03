@@ -17,21 +17,25 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class EditDespesa extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, DialogFragmentCategoria.ExampleDialogListener{
 
-    /*************Global Variables********************************************/
+    /****************Global Variables***************/
+
     public static final String DESPESA = "Despesa";
-    private static Boolean valorLimite = false;
     private DbContabOpenHelper dbContabOpenHelper;
-    RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+    private RegistoMovimentos registoMovimentos;
     private TextView textViewSelectDateDespesa;
     private Spinner spinnerCategoriaDespesa;
     private EditText editTextDesignacaoDespesa;
     private EditText editTextValorDespesa;
     private String id_registo;
+    private TextView textViewSelectedDateDespesa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,22 +44,24 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        loadSpinnerData();
+        //***************************Construção dos objetos***********************************
 
-        //inicializar objetos
         textViewSelectDateDespesa = (TextView) findViewById(R.id.textViewSelectedDateDespesa);
         spinnerCategoriaDespesa = (Spinner) findViewById(R.id.spinnerCategoriaDespesa);
         editTextDesignacaoDespesa = (EditText) findViewById(R.id.editTextDesignacaoDespesa);
         editTextValorDespesa = (EditText) findViewById(R.id.editTextValorDespesa);
-
+        registoMovimentos = new RegistoMovimentos();
         dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
+        textViewSelectedDateDespesa = (TextView) findViewById(R.id.textViewSelectedDateDespesa);
+
+        loadSpinnerData();
 
         try { //getIntent da atividade ListarTodos
             Intent i = getIntent();
             Bundle extras = i.getExtras();
             id_registo = extras.getString("ID");
         } catch (Exception e) {
-            Toast.makeText(EditDespesa.this, "Não foi possível obter o id", Toast.LENGTH_LONG).show();
+            Toast.makeText(EditDespesa.this, R.string.sms_nao_foi_possivel_obter_id, Toast.LENGTH_LONG).show();
         }
 
         //Buscar dados do registo para colocar nos campos
@@ -70,11 +76,23 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
 
     /************************Buttons actions**************************************************/
 
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
     public void addCategoriaEditDespesa(View view) { //Botão adicionar categoria Despesa
         DialogFragmentCategoria dialogFragmentCategoria = new DialogFragmentCategoria();
         dialogFragmentCategoria.show(getSupportFragmentManager(), "DialogFragmentDespesas");
     }
 
+    public void cancel(View view) { //Botão "cancelar"
+        finish();
+    }
 
     public void definirDataEditDespesa(View view) { //Botão definir data
         DialogFragment newFragment = new DatePickerFragment();
@@ -95,48 +113,47 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setMes(month);
         registoMovimentos.setAno(year);
 
-        TextView textViewSelectedDateDespesa = (TextView) findViewById(R.id.textViewSelectedDateDespesa);
         textViewSelectedDateDespesa.setText(""+dayOfMonth+"/"+month+"/"+year);
-
     }
 
     @Override
     public void setTexts(String categoria) { //Ação do botão "addCategoriaDespesa"
 
         try {
-            if (checkCategoriaDespesa(categoria) != -1){ //Se devolver um id != -1 é porque já exite uma categoria com o nome que vamos inserir
-                Toast.makeText(EditDespesa.this, "Categoria já existente!",Toast.LENGTH_LONG).show();
+            if (checkCategoriaDespesa(categoria) != -1){ //Se devolver um id != -1 é porque já exite uma categoria com o nome que vai ser inserido
+                Toast.makeText(EditDespesa.this, R.string.cate_ja_exist,Toast.LENGTH_LONG).show();
                 return;
             }
             insertCategoriaDespesaDb(categoria);
-            Toast.makeText(EditDespesa.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
+            Toast.makeText(EditDespesa.this, R.string.sms_cat_inserida_success,Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            Toast.makeText(EditDespesa.this, "Erro ao inserir a categoria na BD!",Toast.LENGTH_LONG).show();
+            Toast.makeText(EditDespesa.this, R.string.sms_error_inserir_cat_db,Toast.LENGTH_LONG).show();
         }
 
         loadSpinnerData(); //Atualizar spinner
     }
 
     public void updateDespesaDb(View view) { //Botão atualizar despesa
-        //Declaração de objetos
-        final EditText editTextDesignacaoDespesa = (EditText) findViewById(R.id.editTextDesignacaoDespesa);
-        EditText editTextValorDespesa = (EditText) findViewById(R.id.editTextValorDespesa);
-        Spinner spinnerCategoriaDespesa = (Spinner) findViewById(R.id.spinnerCategoriaDespesa);
-        TextView textViewSelectedDateDespesa = (TextView) findViewById(R.id.textViewSelectedDateDespesa);
 
         //Verificar se o campo valor foi preenchido
         double valor = 0;
         try {
             valor = Double.parseDouble(editTextValorDespesa.getText().toString());
         } catch (NumberFormatException e) {
-            editTextValorDespesa.setError("Insira um valor!");
+            editTextValorDespesa.setError(getString(R.string.insira_um_valor));
             editTextValorDespesa.requestFocus();
             return;
         }
 
-        //Verificar se o spinner está vaio
+        if (valor == 0) {
+            editTextValorDespesa.setError(getString(R.string.insira_um_valor_maior_que_0));
+            editTextValorDespesa.requestFocus();
+            return;
+        }
+
+        //Verificar se o spinner está vazio
         if (spinnerCategoriaDespesa.getCount() == 0){
-            Toast.makeText(this, "Por favor, adicione uma categoria!",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.adicione_uma_categoria,Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -151,13 +168,17 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setValor(valorDespesa);
         registoMovimentos.setTipodespesa(idTipoDespesa);
 
-        //Verifica valor da despesa com o valor de orçamento definido
-        double valorOrcamento = getValorOrcamentoFromDb();
-        if (!valorLimite || valorOrcamento == 0) checkOrcamento(valorDespesa);
+        //Debug
+        //TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
+        //textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
 
-        //Teste
-//        TextView textViewDataReadyInsertDb = (TextView) findViewById(R.id.textViewDataReadyInsertDb);
-//        textViewDataReadyInsertDb.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTipodespesa());
+        try { //verifica se data seleciona <= data atual
+            if (!checkDataBeforeInsert(registoMovimentos.getDia(),registoMovimentos.getMes(),registoMovimentos.getAno())){
+                return;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         //insere registo na BD
         try {
@@ -170,29 +191,38 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
                     registoMovimentos.getValor(),
                     registoMovimentos.getTipodespesa()
             );
-            Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Cancelar", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        deleteRegisto(registoMovimentos.getId_movimento());
-                    } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(),"Erro ao eliminar registo...", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }).show();
+            Toast.makeText(getApplicationContext(), R.string.registo_alterado_com_sucesso, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            Snackbar.make(view,"Erro ao inserir registo na BD!",Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            Toast.makeText(getApplicationContext(), R.string.erro_alterar_registo, Toast.LENGTH_LONG).show();
         }
 
         //Limpa os campos preenchidos
         editTextDesignacaoDespesa.setText("");
         editTextValorDespesa.setText("");
         textViewSelectedDateDespesa.setText("");
+
+        goBack();
     }
 
 
     /*************************************Functions and Methods*********************************************/
 
+    private void goBack(){
+        finish();
+    }
+
+    /**
+     * @param id_movimento
+     * @param dia
+     * @param mes
+     * @param ano
+     * @param receitadespesa
+     * @param designacao
+     * @param valor
+     * @param tipodespesa
+     *
+     * atualizar registo despesa na BD
+     */
     private void updateRegistoDespesaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tipodespesa){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -217,7 +247,13 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
     }
 
 
-    private void setSpinnerToValue (Spinner spinner, String value){ //colocar no spinner um valor definido
+    /**
+     * @param spinner
+     * @param value
+     *
+     * colocar no spinner um valor definido
+     */
+    private void setSpinnerToValue (Spinner spinner, String value){
         int index = 0;
         SpinnerAdapter adapter = spinner.getAdapter();
         for (int i = 0; i < adapter.getCount(); i++) {
@@ -229,14 +265,18 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         spinner.setSelection(index);
     }
 
+    /**
+     * carrega todas as categorias despesa no spinner
+     */
     private void loadSpinnerData(){
-        Spinner spinnerCategoriaDespesa = (Spinner) findViewById(R.id.spinnerCategoriaDespesa);
-
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getCategoriasDespesaFromDb());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoriaDespesa.setAdapter(adapter);
     }
 
+    /**
+     * @return lista com todas as categorias despesa
+     */
     public ArrayList<String> getCategoriasDespesaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -254,63 +294,39 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         return list;
     }
 
-    private double getValorDespesaMesFromDb(int mes){ //Obter somatório dos valores das despesas
-        //Abrir a BD
-        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Escrita
-        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
-
-        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
-
-        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM("+DbTableRegistoMovimentos.VALOR+")"},DbTableRegistoMovimentos.RECEITADESPESA+" =? AND "+DbTableRegistoMovimentos.MES+" =?",new String[]{"Despesa", Integer.toString(mes)},null,null,null);
-
-        double valor = 0;
-        valor = DbTableRegistoMovimentos.getValorDespesasFromDb(cursor);
-
-        cursor.close();
-        db.close();
-        return  valor;
-    }
-
+    /**
+     * @return mes atual
+     */
     public int getCurrentMonth(){
         Calendar c = Calendar.getInstance();
         int month = c.get(Calendar.MONTH)+1;
         return month;
     }
 
-    public double getValorOrcamentoFromDb(){ //Obter o ultimo valor de orçamento definido
-        //Abrir a BD
-        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Escrita
-        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
-
-        DbTableOrcamento dbTableOrcamento = new DbTableOrcamento(db);
-
-        Cursor cursor = dbTableOrcamento.query(DbTableOrcamento.VALOR_COLUMN, DbTableOrcamento._ID+"= (SELECT MAX(id_orcamento) FROM Orcamento)", null, null, null, null);
-
-        double valor = 0;
-        valor = DbTableOrcamento.getValorOrcamentoFromDb(cursor);
-
-        cursor.close();
-        db.close();
-        return valor;
+    /**
+     * @return dia atual
+     */
+    private int getCurrentDay(){
+        Calendar c = Calendar.getInstance();
+        int dia = c.get(Calendar.DAY_OF_MONTH);
+        return dia;
     }
 
-    public void checkOrcamento(double valor){ //verifica se a despesa ultrapassa os limites de orçamento definidos
-        double currentMonth = getCurrentMonth();
-        double valorAlerta = getValorOrcamentoFromDb() - (valor + getValorDespesaMesFromDb((int) currentMonth));
-        if(getValorOrcamentoFromDb() < (valor+getValorDespesaMesFromDb((int) currentMonth))){
-            Toast.makeText(this,"A despesa que inseriu ultrapassou o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
-            valorLimite = true;
-        }else if (valorAlerta < 50 && valorAlerta != 0){
-            Toast.makeText(this, "Está a "+String.format("%.2f",valorAlerta)+" € de atingir o seu limite de orçamento mensal!",Toast.LENGTH_LONG).show();
-        }else if (valorAlerta == 0){
-            Toast.makeText(this,"Atingiu o limite de orçamento mensal!",Toast.LENGTH_LONG).show();
-            valorLimite = true;
-        }
+    /**
+     * @return ano atual
+     */
+    private int getCurrentYear(){
+        Calendar c = Calendar.getInstance();
+        int ano = c.get(Calendar.YEAR);
+        return ano;
     }
 
-    public int checkCategoriaDespesa(String categoria){//retorna id da categoria
+
+    /**
+     * @param categoria
+     * @return id = -1 se não existir a categoria
+     */
+    public int checkCategoriaDespesa(String categoria){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Escrita
@@ -321,7 +337,7 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
 
         int id = -1;
 
-        if (cursor.getCount() > 0){ //Se devolver pelo menos uma linha é porque a categoria já existe.
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             id = cursor.getInt(cursor.getColumnIndex(DbTableTipoDespesa._ID));
         }
@@ -331,6 +347,11 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         return id;
     }
 
+    /**
+     * @param categoria
+     *
+     * inserir uma categoria despesa na BD
+     */
     private void insertCategoriaDespesaDb(String categoria) {
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -346,18 +367,10 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         db.close();
     }
 
-    private void deleteRegisto(String id){
-        //Abrir a BD
-        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Escrita
-        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
-
-        DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
-        tableRegistoMovimentos.delete(DbTableRegistoMovimentos._ID+"=?",new String[]{id});
-
-        db.close();
-    }
-
+    /**
+     * @param categoria
+     * @return id da categoria
+     */
     private int getIdCategoriaDespesa(String categoria){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -373,5 +386,31 @@ public class EditDespesa extends AppCompatActivity implements DatePickerDialog.O
         cursor.close();
         db.close();
         return id;
+    }
+
+    /**
+     * @param dia
+     * @param mes
+     * @param ano
+     * @return false se a data selecionada > data atual
+     * @throws ParseException
+     */
+    private Boolean checkDataBeforeInsert(int dia, int mes, int ano) throws ParseException {
+        boolean insert = true;
+        int diaAtual = getCurrentDay();
+        int mesAtual = getCurrentMonth();
+        int anoAtual = getCurrentYear();
+
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+        Date atualDate = format.parse(diaAtual+"-"+mesAtual+"-"+anoAtual);
+        Date selectDate = format.parse(dia+"-"+mes+"-"+ano);
+
+        if (atualDate.compareTo(selectDate) < 0) {
+            Toast.makeText(getApplicationContext(), R.string.sms_alert_inserir_registos_data_futura, Toast.LENGTH_LONG).show();
+            insert = false;
+        }
+
+        return insert;
     }
 }
