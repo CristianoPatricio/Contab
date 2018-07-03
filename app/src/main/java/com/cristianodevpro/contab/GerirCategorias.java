@@ -18,8 +18,10 @@ import java.util.ArrayList;
 
 public class GerirCategorias extends AppCompatActivity implements DialogFragmentCategoria.ExampleDialogListener {
 
+    //*****************************Variáveis********************************
     public static boolean clickedButtonCatReceita = false;
     public static boolean clickButtonCatDespesa = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,21 +43,21 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
                 //Dialog de confirmação
                 /****************************************************************************************/
                 AlertDialog.Builder builder = new AlertDialog.Builder(GerirCategorias.this);
-                builder.setTitle("Eliminar categoria \""+categoria+"\"")
-                        .setMessage("Tem a certeza?")
-                        .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                builder.setTitle(getString(R.string.eliminar_categoria) +categoria+"\"")
+                        .setMessage(R.string.tem_a_certeza)
+                        .setPositiveButton(R.string.sim, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 try {
                                     deleteCategoriaReceita(id); //elimina categoria receita
-                                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), R.string.cat_eliminada_success, Toast.LENGTH_LONG).show();
                                 } catch (Exception e) {
-                                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), R.string.erro_eliminar_cat, Toast.LENGTH_LONG).show();
                                 }
                                 updateListCategoriasReceitas(); //atualiza lista
                             }
                         })
-                        .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.nao1, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel(); //cancela a operação
@@ -79,21 +81,21 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
                 //Dialog de confirmação
                 /****************************************************************************************/
                 AlertDialog.Builder builder = new AlertDialog.Builder(GerirCategorias.this);
-                builder.setTitle("Eliminar categoria \""+categoria+"\"")
-                        .setMessage("Tem a certeza?")
-                        .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                builder.setTitle(getString(R.string.eliminar_categoria) +categoria+"\"")
+                        .setMessage(R.string.tem_a_certeza)
+                        .setPositiveButton(R.string.sim, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 try {
                                     deleteCategoriaDespesa(id); //elimina categoria despesa
-                                    Toast.makeText(getApplicationContext(),"Categoria eliminada com sucesso!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(),R.string.cat_eliminada_success, Toast.LENGTH_LONG).show();
                                 } catch (Exception e) {
-                                    Toast.makeText(getApplicationContext(),"Erro ao eliminar categoria...", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(),R.string.erro_eliminar_cat, Toast.LENGTH_LONG).show();
                                 }
                                 updateListCategoriasDespesas(); //atualiza lista
                             }
                         })
-                        .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.nao1, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel(); //cancela a operação
@@ -132,13 +134,13 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         if (clickedButtonCatReceita && !clickButtonCatDespesa) { //Click no Botão add cat. receitas
             try {
                 if (checkCategoriaReceita(categoria) != -1) { //Se devolver um id != -1 é porque já exite uma categoria com o nome que vamos inserir
-                    Toast.makeText(GerirCategorias.this, "Categoria já existente!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(GerirCategorias.this, R.string.cate_ja_exist, Toast.LENGTH_LONG).show();
                     return;
                 }
                 insertCategoriaReceitaDb(categoria);
-                Toast.makeText(GerirCategorias.this, "Categoria inserida com sucesso!", Toast.LENGTH_LONG).show();
+                Toast.makeText(GerirCategorias.this, R.string.sms_cat_inserida_success, Toast.LENGTH_LONG).show();
             } catch (Exception e) {
-                Toast.makeText(GerirCategorias.this, "Erro ao inserir a categoria na BD!", Toast.LENGTH_LONG).show();
+                Toast.makeText(GerirCategorias.this, R.string.sms_error_inserir_cat_db, Toast.LENGTH_LONG).show();
             }
 
             updateListCategoriasReceitas(); //atualizar listview cat. receitas
@@ -147,13 +149,13 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         }else if (clickButtonCatDespesa && !clickedButtonCatReceita){ //Click no Botão ass cat. despesas
             try {
                 if (checkCategoriaDespesa(categoria) != -1) { //Se devolver um id != -1 é porque já exite uma categoria com o nome que vamos inserir
-                    Toast.makeText(GerirCategorias.this, "Categoria já existente!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(GerirCategorias.this, R.string.cate_ja_exist, Toast.LENGTH_LONG).show();
                     return;
                 }
                 insertCategoriaDespesaDb(categoria);
-                Toast.makeText(GerirCategorias.this, "Categoria inserida com sucesso!", Toast.LENGTH_LONG).show();
+                Toast.makeText(GerirCategorias.this, R.string.sms_cat_inserida_success, Toast.LENGTH_LONG).show();
             } catch (Exception e) {
-                Toast.makeText(GerirCategorias.this, "Erro ao inserir a categoria na BD!", Toast.LENGTH_LONG).show();
+                Toast.makeText(GerirCategorias.this,  R.string.sms_error_inserir_cat_db, Toast.LENGTH_LONG).show();
             }
 
             updateListCategoriasDespesas(); //atualizar listview cat. despesas
@@ -164,10 +166,11 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
     }
 
     /**********************************Functions and Methods***************************************/
+
     private ArrayList<String> getCategoriasReceitaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Op. escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
@@ -181,10 +184,13 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         return list;
     }
 
+    /**
+     * @return lista de todas as categorias despesa
+     */
     private ArrayList<String> getCategoriasDespesaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Op. escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
@@ -198,10 +204,14 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         return list;
     }
 
+    /**
+     * @param categoria
+     * @return id de uma categoria de receita
+     */
     private int getIdCategoriaReceita(String categoria){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Op. escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
@@ -215,10 +225,14 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         return id;
     }
 
+    /**
+     * @param categoria
+     * @return id de uma categoria de despesa
+     */
     private int getIdCategoriaDespesa(String categoria){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Op. escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoDespesa dbTableTipoDespesa = new DbTableTipoDespesa(db);
@@ -232,11 +246,16 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         return id;
     }
 
+    /**
+     * @param id
+     *
+     * elimina categoria receita com o id
+     */
     private void deleteCategoriaReceita(int id){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Escrita
-        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
         DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
         dbTableTipoReceita.delete(DbTableTipoReceita._ID+"=?",new String[]{Integer.toString(id)});
@@ -244,6 +263,11 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         db.close();
     }
 
+    /**
+     * @param id
+     *
+     * elimina categoria despesa com o id
+     */
     private void deleteCategoriaDespesa(int id){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -256,6 +280,9 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         db.close();
     }
 
+    /**
+     * atualiza lista das categorias de receitas
+     */
     private void updateListCategoriasReceitas(){
         //ListView Categorias Receitas
         ListAdapter listAdapterReceitas = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,getCategoriasReceitaFromDb());
@@ -263,6 +290,9 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         listViewReceitas.setAdapter(listAdapterReceitas);
     }
 
+    /**
+     * atualiza lista das categorias de despesa
+     */
     private void updateListCategoriasDespesas(){
         //ListView Categorias Despesas
         ListAdapter listAdapterDespesas = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,getCategoriasDespesaFromDb());
@@ -270,6 +300,11 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         listViewDespesas.setAdapter(listAdapterDespesas);
     }
 
+    /**
+     * @param categoria
+     *
+     * insere categoria receita
+     */
     private void insertCategoriaReceitaDb(String categoria) {
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -285,10 +320,14 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         db.close();
     }
 
+    /**
+     * @param categoria
+     * @return id = -1 se não existir a categoria
+     */
     public int checkCategoriaReceita(String categoria){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         String query = "SELECT "+DbTableTipoReceita._ID+" FROM "+DbTableTipoReceita.TABLE_NAME+" WHERE "+DbTableTipoReceita.CATEGORIA_RECEITA+" =?";
@@ -296,7 +335,7 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
 
         int id = -1;
 
-        if (cursor.getCount() > 0){ //Se devolver pelo menos uma linha é porque a categoria já existe.
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             id = cursor.getInt(cursor.getColumnIndex(DbTableTipoReceita._ID));
         }
@@ -306,6 +345,11 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         return id;
     }
 
+    /**
+     * @param categoria
+     *
+     * insere categoria de despesa
+     */
     private void insertCategoriaDespesaDb(String categoria) {
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -321,10 +365,14 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
         db.close();
     }
 
-    public int checkCategoriaDespesa(String categoria){//retorna id da categoria
+    /**
+     * @param categoria
+     * @return id = -1 se não existir a categoria
+     */
+    public int checkCategoriaDespesa(String categoria){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         String query = "SELECT "+DbTableTipoDespesa._ID+" FROM "+DbTableTipoDespesa.TABLE_NAME+" WHERE "+DbTableTipoDespesa.CATEGORIA_DESPESAS+" =?";
@@ -332,7 +380,7 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
 
         int id = -1;
 
-        if (cursor.getCount() > 0){ //Se devolver pelo menos uma linha é porque a categoria já existe.
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             id = cursor.getInt(cursor.getColumnIndex(DbTableTipoDespesa._ID));
         }
