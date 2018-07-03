@@ -3,6 +3,7 @@ package com.cristianodevpro.contab;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DialogFragmentOrcamento extends AppCompatDialogFragment {
 
@@ -28,18 +30,25 @@ public class DialogFragmentOrcamento extends AppCompatDialogFragment {
         builder.setView(view)
 
                 //Add action buttons
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.cancelar_dialog_cat, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 })
-                .setPositiveButton("Definir", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.definir_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //atribuir os valores às variáveis
-                        double orcamento = Double.parseDouble(editTextInput.getText().toString());
-                        listener.setValue(orcamento);
+                        //Verificar se o campo está vazio
+                        double orcamento = 0;
+                        try {
+                            orcamento = Double.parseDouble(editTextInput.getText().toString());
+                            listener.setValue(orcamento);
+                            goToMainActivity();
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(getContext(), R.string.sms_orc_n_definido,Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 });
 
@@ -62,5 +71,10 @@ public class DialogFragmentOrcamento extends AppCompatDialogFragment {
 
     public interface ExampleDialogListener {
         void setValue(double orcamento);
+    }
+
+    private void goToMainActivity(){
+        Intent i = new Intent(getContext(), MainActivity.class);
+        startActivity(i);
     }
 }
