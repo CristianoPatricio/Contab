@@ -35,7 +35,6 @@ public class DbTableTipoReceita implements BaseColumns {
     //CRUD
     public static ContentValues getContentValues(TipoReceita tipoReceita){
         ContentValues values = new ContentValues();
-        //values.put(_ID, tipoReceita.getId_receita());
         values.put(CATEGORIA_RECEITA, tipoReceita.getCategoria());
 
         return values;
@@ -53,7 +52,7 @@ public class DbTableTipoReceita implements BaseColumns {
         return tipoReceita;
     }
 
-    public static int getIdCategoriaReceita(Cursor cursor){
+    public static int getIdCategoriaReceita(Cursor cursor){ //devolve id cat. receita
         final int posId = cursor.getColumnIndex(_ID);
 
         int id = 0;
@@ -64,7 +63,7 @@ public class DbTableTipoReceita implements BaseColumns {
         return id;
     }
 
-    public static ArrayList<String> getCategoriasReceitaFromDb(Cursor cursor){
+    public static ArrayList<String> getCategoriasReceitaFromDb(Cursor cursor){ //lista com cat. receitas
         final int posCatRec = cursor.getColumnIndex(CATEGORIA_RECEITA);
 
         ArrayList<String> list = new ArrayList<>();
@@ -78,7 +77,7 @@ public class DbTableTipoReceita implements BaseColumns {
         return list;
     }
 
-    public static String getTipoReceitaByID(Cursor cursor){
+    public static String getTipoReceitaByID(Cursor cursor){ //devolve cat. receita por id
         final int posCatRec = cursor.getColumnIndex(CATEGORIA_RECEITA);
 
         String categoria = "";
