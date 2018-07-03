@@ -35,7 +35,6 @@ public class DbTableTipoDespesa implements BaseColumns {
     //CRUD
     public static ContentValues getContentValues(TipoDespesa tipoDespesa){
         ContentValues values = new ContentValues();
-        //values.put(_ID, tipoDespesa.getId_despesa());
         values.put(CATEGORIA_DESPESAS, tipoDespesa.getCategoria());
 
         return values;
@@ -53,7 +52,7 @@ public class DbTableTipoDespesa implements BaseColumns {
         return tipoDespesa;
     }
 
-    public static int getIdCategoriaDespesa(Cursor cursor){
+    public static int getIdCategoriaDespesa(Cursor cursor){ //devolve id da cat. despesa
         final int posId = cursor.getColumnIndex(_ID);
 
         int id = 0;
@@ -64,7 +63,7 @@ public class DbTableTipoDespesa implements BaseColumns {
         return id;
     }
 
-    public static ArrayList<String> getCategoriasDespesaFromDb(Cursor cursor){
+    public static ArrayList<String> getCategoriasDespesaFromDb(Cursor cursor){ //lista de cat. despesa
         final int posCatDes = cursor.getColumnIndex(CATEGORIA_DESPESAS);
 
         ArrayList<String> list = new ArrayList<>();
