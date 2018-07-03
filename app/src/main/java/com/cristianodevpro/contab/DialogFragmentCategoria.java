@@ -28,20 +28,20 @@ public class DialogFragmentCategoria extends AppCompatDialogFragment {
         View view = inflater.inflate(R.layout.dialog_categoria_layout, null);
         builder.setView(view)
 
-                //Add action buttons
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.cancelar_dialog_cat, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        GerirCategorias.clickedButtonCatReceita = false;
+                        GerirCategorias.clickButtonCatDespesa = false;
                     }
                 })
-                .setPositiveButton("Inserir", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.inserir_1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //Verificar se o campo está vazio
-                        String categoria = editTextInput.getText().toString();
+                        String categoria = editTextInput.getText().toString().trim();
                         if (categoria.trim().isEmpty()){
-                            Toast.makeText(getContext(), "Não foram inseridas categorias!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), R.string.sms_cat_n_inserida, Toast.LENGTH_LONG).show();
                         }else {
                             listener.setTexts(categoria);
                         }
