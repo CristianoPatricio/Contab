@@ -39,7 +39,7 @@ public class EditReceita extends AppCompatActivity implements DatePickerDialog.O
     private EditText editTextValorReceita;
     private String id_registo;
 
-    /*adicionado novo*/
+    //Content Provider********NÃO USADO
     private static final int CATEGORIES_CURSOR_LOADER_ID = 0;
     private RegistoMovimentosAdapter registoMovimentosAdapter;
 
