@@ -120,7 +120,7 @@ public class DbTableRegistoMovimentos implements BaseColumns {
         final int posValor = 0; //select SUM(valor) -> coluna 0
 
         double valorDespesas = 0;
-        if (cursor.getCount() > 0){ //Encontra pelo um registo
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             valorDespesas = cursor.getDouble(posValor);
         }
@@ -128,11 +128,11 @@ public class DbTableRegistoMovimentos implements BaseColumns {
         return valorDespesas;
     }
 
-    public static double getValorReceitasFromDb(Cursor cursor){
+    public static double getValorReceitasFromDb(Cursor cursor){ //Obter o valor das receitas
         final int posValor = 0; //select SUM(valor) -> coluna 0
 
         double valorReceitas = 0;
-        if (cursor.getCount() > 0){ //Encontra um registo
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             valorReceitas = cursor.getDouble(posValor);
         }
@@ -140,11 +140,11 @@ public class DbTableRegistoMovimentos implements BaseColumns {
         return valorReceitas;
     }
 
-    public static double getSaldoFromDb(Cursor cursor){
+    public static double getSaldoFromDb(Cursor cursor){ //Obter o saldo
         final int posValor = 0; //select SUM(valor) -> coluna 0
 
         double saldo = 0;
-        if (cursor.getCount() > 0){ //Encontra um registo
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             saldo = cursor.getDouble(posValor);
         }
