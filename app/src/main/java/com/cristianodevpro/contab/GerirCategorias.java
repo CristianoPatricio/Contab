@@ -81,7 +81,7 @@ public class GerirCategorias extends AppCompatActivity implements DialogFragment
                 //Dialog de confirmação
                 /****************************************************************************************/
                 AlertDialog.Builder builder = new AlertDialog.Builder(GerirCategorias.this);
-                builder.setTitle(getString(R.string.eliminar_categoria) +categoria+"\"")
+                builder.setTitle(getString(R.string.eliminar_categoria) +"\""+categoria+"\"")
                         .setMessage(R.string.tem_a_certeza)
                         .setPositiveButton(R.string.sim, new DialogInterface.OnClickListener() {
                             @Override
