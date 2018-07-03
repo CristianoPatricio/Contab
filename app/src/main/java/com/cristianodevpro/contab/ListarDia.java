@@ -22,6 +22,7 @@ public class ListarDia extends AppCompatActivity implements DatePickerDialog.OnD
     private RegistoMovimentosAdapter adapter;
     private RecyclerView recyclerViewListarDia;
     private TextView textViewSelectDate;
+    private DbContabOpenHelper dbContabOpenHelper;
     private ImageButton imageButtonSelectDateListar;
 
     @Override
@@ -31,29 +32,19 @@ public class ListarDia extends AppCompatActivity implements DatePickerDialog.OnD
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        /**********************Construção dos objetos************************/
+        dbContabOpenHelper = new DbContabOpenHelper(this);
+        recyclerViewListarDia = (RecyclerView) findViewById(R.id.recyclerViewListarDia);
         imageButtonSelectDateListar = (ImageButton) findViewById(R.id.imageButtonSelectDateListar);
         textViewSelectDate = (TextView) findViewById(R.id.textViewSelectDateListar);
 
-        int dia = getCurrentDay();
-        int mes = getCurrentMonth();
-        int ano = getCurrentYear();
+        initComponents();
+    }
 
-        textViewSelectDate.setText(""+dia+"/"+mes+"/"+ano);
-
-        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(this);
-        adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosDia(dia,mes,ano), this, recyclerViewListarDia);
-
-        //verificar se há registos
-        if (dbContabOpenHelper.getListRegistoMovimentosDia(dia,mes,ano).size()==0){
-            Toast.makeText(this, "Não foram encontrados registos para a data de "+textViewSelectDate.getText(), Toast.LENGTH_LONG).show();
-        }
-
-        recyclerViewListarDia = (RecyclerView) findViewById(R.id.recyclerViewListarDia);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerViewListarDia.setLayoutManager(layoutManager);
-        recyclerViewListarDia.setItemAnimator(new DefaultItemAnimator());
-        recyclerViewListarDia.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        recyclerViewListarDia.setAdapter(adapter);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initComponents();
     }
 
     /**
@@ -62,8 +53,7 @@ public class ListarDia extends AppCompatActivity implements DatePickerDialog.OnD
      */
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        finish();
     }
 
     /**********************************Buttons actions***************************************************/
@@ -84,15 +74,13 @@ public class ListarDia extends AppCompatActivity implements DatePickerDialog.OnD
         month++;
 
         //Atualiza dados no recyclerview
-        DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(this);
         adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosDia(dayOfMonth,month,year), this, recyclerViewListarDia);
 
         //verificar se há registos
         if (dbContabOpenHelper.getListRegistoMovimentosDia(dayOfMonth,month,year).size()==0){
-            Toast.makeText(this, "Não foram encontrados registos para a data de "+textViewSelectDate.getText(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.nao_foram_encontrados_registos_data)+" "+dayOfMonth+"/"+month+"/"+year, Toast.LENGTH_LONG).show();
         }
 
-        recyclerViewListarDia = (RecyclerView) findViewById(R.id.recyclerViewListarDia);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerViewListarDia.setLayoutManager(layoutManager);
         recyclerViewListarDia.setItemAnimator(new DefaultItemAnimator());
@@ -105,22 +93,55 @@ public class ListarDia extends AppCompatActivity implements DatePickerDialog.OnD
 
     /**************************************Functions***********************************************/
 
-    private int getCurrentDay(){ //Data atual
+    /**
+     * @return dia atual
+     */
+    private int getCurrentDay(){
         Calendar c = Calendar.getInstance();
         int dia = c.get(Calendar.DAY_OF_MONTH);
         return dia;
     }
 
-    private int getCurrentMonth(){ //Data atual
+    /**
+     * @return mes atual
+     */
+    private int getCurrentMonth(){
         Calendar c = Calendar.getInstance();
         int mes = c.get(Calendar.MONTH)+1;
         return mes;
     }
 
-    private int getCurrentYear(){ //Data atual
+    /**
+     * @return ano atual
+     */
+    private int getCurrentYear(){
         Calendar c = Calendar.getInstance();
         int ano = c.get(Calendar.YEAR);
         return ano;
+    }
+
+    /**
+     * carregar/atualizar recycler view com os dados
+     */
+    private void initComponents(){
+        int dia = getCurrentDay();
+        int mes = getCurrentMonth();
+        int ano = getCurrentYear();
+
+        textViewSelectDate.setText(""+dia+"/"+mes+"/"+ano);
+
+        adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosDia(dia,mes,ano), this, recyclerViewListarDia);
+
+        //verificar se há registos
+        if (dbContabOpenHelper.getListRegistoMovimentosDia(dia,mes,ano).size()==0){
+            Toast.makeText(this,getString(R.string.nao_foram_encontrados_registos_data)+" "+textViewSelectDate.getText(), Toast.LENGTH_LONG).show();
+        }
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerViewListarDia.setLayoutManager(layoutManager);
+        recyclerViewListarDia.setItemAnimator(new DefaultItemAnimator());
+        recyclerViewListarDia.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerViewListarDia.setAdapter(adapter);
     }
 
 }
