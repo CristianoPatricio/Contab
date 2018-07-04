@@ -1,39 +1,40 @@
 package com.cristianodevpro.contab;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class NovaReceita extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, DialogFragmentCategoria.ExampleDialogListener{
 
-    /*************Global Variables********************************************/
+    /*********************************Variáveis*******************************/
+
     public static final String RECEITA = "Receita";
     private static Boolean isClicked = false;
-    RegistoMovimentos registoMovimentos = new RegistoMovimentos();
+    private RegistoMovimentos registoMovimentos;
+    private TextView textViewSelectedDate;
+    private EditText editTextDesignacaoReceita;
+    private EditText editTextValorReceita;
+    private Spinner spinnerCategoria;
+    private TextView textViewSelectedDateReceita;
+    private TextView textViewDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +43,18 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Apagar todos os registos da tabela TipoReceitas
-        //DbContabOpenHelper db = new DbContabOpenHelper(getApplicationContext());
-        //db.deleteAllCategoriaReceita();
+        /**************************Construção dos objetos***************************/
 
-        loadSpinnerData(); //Carrega categorias da DB para spinner
+        registoMovimentos = new RegistoMovimentos();
+        textViewSelectedDate = (TextView) findViewById(R.id.textViewSelectedDate);
+        editTextDesignacaoReceita = (EditText) findViewById(R.id.editTextDesignacaoReceita);
+        editTextValorReceita = (EditText) findViewById(R.id.editTextValorReceita);
+        spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
+        textViewSelectedDateReceita = (TextView) findViewById(R.id.textViewSelectedDate);
+        textViewDate = (TextView) findViewById(R.id.textViewSelectedDate);
+
+
+        loadSpinnerData(); //carrega categorias da DB para spinner
 
         setDefaultDateToTextView(); //Definir data atual no textview
     }
@@ -60,12 +68,10 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
        finish();
     }
 
-    /************************Handle buttons actions**************************************************/
+    /***************************************Buttons Actions****************************************/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -94,7 +100,6 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         isClicked = true;
 
-        TextView textViewSelectedDate = (TextView) findViewById(R.id.textViewSelectedDate);
         textViewSelectedDate.setText(""+dayOfMonth+"/"+month+"/"+year);
     }
 
@@ -108,13 +113,13 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         try {
             if(checkCategoriaReceita(categoria) != -1) { //Se devolver um id != -1 é porque já exite uma categoria com o nome que vamos inserir
-                Toast.makeText(NovaReceita.this, "Categoria já existente!",Toast.LENGTH_LONG).show();
+                Toast.makeText(NovaReceita.this, R.string.cate_ja_exist,Toast.LENGTH_LONG).show();
                 return;
             }
             insertCategoriaReceitaDb(categoria);
-            Toast.makeText(NovaReceita.this, "Categoria inserida com sucesso!",Toast.LENGTH_LONG).show();
+            Toast.makeText(NovaReceita.this, R.string.sms_cat_inserida_success,Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            Toast.makeText(NovaReceita.this, "Erro ao inserir a categoria na BD!",Toast.LENGTH_LONG).show();
+            Toast.makeText(NovaReceita.this, R.string.sms_error_inserir_cat_db,Toast.LENGTH_LONG).show();
         }
 
         loadSpinnerData(); //atualizar spinner
@@ -122,24 +127,19 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
     }
 
     public void inserirReceitaDb(View view) { //Botão "inserir Receita"
-        //Declaração de objetos
-        final EditText editTextDesignacaoReceita = (EditText) findViewById(R.id.editTextDesignacaoReceita);
-        EditText editTextValorReceita = (EditText) findViewById(R.id.editTextValorReceita);
-        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
-        TextView textViewSelectedDateReceita = (TextView) findViewById(R.id.textViewSelectedDate);
 
         //Verificar se o campo valor foi preenchido
         double valor = 0;
         try {
             valor = Double.parseDouble(editTextValorReceita.getText().toString());
         } catch (NumberFormatException e) {
-            editTextValorReceita.setError("Insira um valor!");
+            editTextValorReceita.setError(getString(R.string.insira_um_valor));
             editTextValorReceita.requestFocus();
             return;
         }
 
         if (valor == 0) {
-            editTextValorReceita.setError("Insira um valor maior que 0");
+            editTextValorReceita.setError(getString(R.string.insira_um_valor_maior_que_0));
             editTextValorReceita.requestFocus();
             return;
         }
@@ -151,7 +151,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         //Verificar se o spinner está vaio
         if (spinnerCategoria.getCount() == 0){
-            Toast.makeText(this, "Por favor, adicione uma categoria!",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.adicione_uma_categoria,Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -166,13 +166,13 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setValor(valorReceita);
         registoMovimentos.setTiporeceita(idTipoReceita);
 
-        //Teste (last test: 9jun18: Success!)
-  //      TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
-//        textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
+        //Debug
+        //TextView textViewTestDate = (TextView) findViewById(R.id.textViewTestDate);
+        //textViewTestDate.setText(""+registoMovimentos.getId_movimento()+"-"+registoMovimentos.getDia()+"-"+registoMovimentos.getMes()+"-"+registoMovimentos.getAno()+"-"+registoMovimentos.getReceitadespesa()+"-"+registoMovimentos.getDesignacao()+"-"+registoMovimentos.getValor()+"-"+registoMovimentos.getTiporeceita());
 
         isClicked = false;
 
-        try {
+        try { //verifica se data seleciona <= data atual
             if (!checkDataToInsert(registoMovimentos.getDia(),registoMovimentos.getMes(),registoMovimentos.getAno())){
                 return;
             }
@@ -191,31 +191,38 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
                                     registoMovimentos.getValor(),
                                     registoMovimentos.getTiporeceita()
             );
-            Snackbar snackbar = Snackbar.make(view,"Registo inserido com sucesso!",Snackbar.LENGTH_LONG).setAction("Anular", new View.OnClickListener() {
+            Snackbar snackbar = Snackbar.make(view,R.string.registo_inserido_success,Snackbar.LENGTH_LONG).setAction(R.string.anular_registo, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
                         deleteRegisto(registoMovimentos.getId_movimento());
-                        Toast.makeText(getApplicationContext(),"Registo eliminado com sucesso!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),R.string.registo_eliminado_success, Toast.LENGTH_LONG).show();
                     } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(),"Erro ao eliminar registo...", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),R.string.erro_eliminar_registo, Toast.LENGTH_LONG).show();
                     }
                 }
             });
             snackbar.setActionTextColor(Color.RED);
             snackbar.show();
         } catch (Exception e) {
-            Snackbar.make(view,"Erro ao inserir registo na BD!",Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            Snackbar.make(view,R.string.erro_inserir_registo_bd,Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
 
         //Limpa os campos preenchidos
         editTextDesignacaoReceita.setText("");
         editTextValorReceita.setText("");
         textViewSelectedDateReceita.setText("");
+        setDefaultDateToTextView();
     }
 
     /*****************************Functions and Methods****************************************/
 
+    /**
+     *
+     * @param categoria
+     *
+     * insere categoria receita na BD
+     */
     private void insertCategoriaReceitaDb(String categoria) {
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -232,7 +239,10 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
     }
 
 
-    public static String getNowDate(){ //Data e Hora atuais
+    /**
+     * @return data completa atual concatenada: ddMMyyHHmmss
+     */
+    private static String getNowDate(){
         //Data e Hora
         SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
         SimpleDateFormat horaFormat = new SimpleDateFormat("HHmmss");
@@ -250,7 +260,10 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return concatDate;
     }
 
-    public void setDefaultDateDb(){ //Data atual
+    /**
+     * definir data atual por defeito
+     */
+    private void setDefaultDateDb(){
         Calendar c = Calendar.getInstance();
         int ano = c.get(Calendar.YEAR);
         int mes = c.get(Calendar.MONTH) + 1;
@@ -261,24 +274,45 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         registoMovimentos.setDia(dia);
     }
 
-    private int getCurrentDay(){ //Data atual
+    /**
+     * @return dia atual
+     */
+    private int getCurrentDay(){
         Calendar c = Calendar.getInstance();
         int dia = c.get(Calendar.DAY_OF_MONTH);
         return dia;
     }
 
-    public int getCurrentMonth(){
+    /**
+     * @return mes atual
+     */
+    private int getCurrentMonth(){
         Calendar c = Calendar.getInstance();
         int month = c.get(Calendar.MONTH)+1;
         return month;
     }
 
-    private int getCurrentYear(){ //Data atual
+    /**
+     * @return ano atual
+     */
+    private int getCurrentYear(){
         Calendar c = Calendar.getInstance();
         int ano = c.get(Calendar.YEAR);
         return ano;
     }
 
+    /**
+     * @param id_movimento
+     * @param dia
+     * @param mes
+     * @param ano
+     * @param receitadespesa
+     * @param designacao
+     * @param valor
+     * @param tiporeceita
+     *
+     * inserir registo receita na BD
+     */
     private void insertRegistoReceitaDb(String id_movimento, int dia, int mes, int ano, String receitadespesa, String designacao, double valor, int tiporeceita){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
@@ -302,10 +336,13 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         db.close();
     }
 
-    public ArrayList<String> getCategoriasReceitaFromDb(){
+    /**
+     * @return lista das categorias receita
+     */
+    private ArrayList<String> getCategoriasReceitaFromDb(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Op. escrita
+        //Op. Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
@@ -319,18 +356,23 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return list;
     }
 
+    /**
+     * carrega as categorias das receitas para o spinner
+     */
     private void loadSpinnerData(){
-        Spinner spinnerCategoria = (Spinner) findViewById(R.id.spinnerCategoria);
-
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getCategoriasReceitaFromDb());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategoria.setAdapter(adapter);
     }
 
-    public int checkCategoriaReceita(String categoria){
+    /**
+     * @param categoria
+     * @return -1 se o nome da categoria não existir
+     */
+    private int checkCategoriaReceita(String categoria){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Escrita
+        //Leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         String query = "SELECT "+DbTableTipoReceita._ID+" FROM "+DbTableTipoReceita.TABLE_NAME+" WHERE "+DbTableTipoReceita.CATEGORIA_RECEITA+" =?";
@@ -338,7 +380,7 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
 
         int id = -1;
 
-        if (cursor.getCount() > 0){ //Se devolver pelo menos uma linha é porque a categoria já existe.
+        if (cursor.getCount() > 0){
             cursor.moveToFirst();
             id = cursor.getInt(cursor.getColumnIndex(DbTableTipoReceita._ID));
         }
@@ -348,11 +390,16 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return id;
     }
 
+    /**
+     * @param id
+     *
+     * elimina registo com o id
+     */
     private void deleteRegisto(String id){
         //Abrir a BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
         //Escrita
-        SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
+        SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
         DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
         tableRegistoMovimentos.delete(DbTableRegistoMovimentos._ID+"=?",new String[]{id});
@@ -360,10 +407,14 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         db.close();
     }
 
+    /**
+     * @param categoria
+     * @return id da categoria da receita
+     */
     private int getIdCategoriaReceita(String categoria){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getApplicationContext());
-        //Op. escrita
+        //Op. leitura
         SQLiteDatabase db = dbContabOpenHelper.getReadableDatabase();
 
         DbTableTipoReceita dbTableTipoReceita = new DbTableTipoReceita(db);
@@ -377,9 +428,10 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         return id;
     }
 
+    /**
+     * define a data atual no text view date
+     */
     private void setDefaultDateToTextView(){
-        TextView textViewDate = (TextView) findViewById(R.id.textViewSelectedDate);
-
         int dia = getCurrentDay();
         int mes = getCurrentMonth();
         int ano = getCurrentYear();
@@ -387,7 +439,14 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         textViewDate.setText(""+dia+"/"+mes+"/"+ano);
     }
 
-    public Boolean checkDataToInsert(int dia, int mes, int ano) throws ParseException { //comparar data selecionada com data atual
+    /**
+     * @param dia
+     * @param mes
+     * @param ano
+     * @return false se a data selecionada > data atual
+     * @throws ParseException
+     */
+    private Boolean checkDataToInsert(int dia, int mes, int ano) throws ParseException {
         boolean insert = true;
         int diaAtual = getCurrentDay();
         int mesAtual = getCurrentMonth();
@@ -398,8 +457,8 @@ public class NovaReceita extends AppCompatActivity implements DatePickerDialog.O
         Date atualDate = format.parse(diaAtual+"-"+mesAtual+"-"+anoAtual);
         Date selectDate = format.parse(dia+"-"+mes+"-"+ano);
 
-        if (atualDate.compareTo(selectDate) <= 0) {
-            Toast.makeText(getApplicationContext(), "Não pode inserir registos para datas futuras!", Toast.LENGTH_LONG).show();
+        if (atualDate.compareTo(selectDate) < 0) {
+            Toast.makeText(getApplicationContext(), R.string.sms_alert_inserir_registos_data_futura, Toast.LENGTH_LONG).show();
             insert = false;
         }
 
