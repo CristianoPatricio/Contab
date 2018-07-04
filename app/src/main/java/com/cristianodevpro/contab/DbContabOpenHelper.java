@@ -107,8 +107,9 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
     }
 
 
-    //Funções
-    public void deleteAllCategoriaReceita(){
+    //****************************************Functions*********************************************
+
+    public void deleteAllCategoriaReceita(){ //remove todas as cat. receitas
         String query = "DELETE FROM "+DbTableTipoReceita.TABLE_NAME;
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -125,7 +126,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteAllCategoriaDespesa(){
+    public void deleteAllCategoriaDespesa(){ //remove todas as cat. despesas
         String query = "DELETE FROM "+DbTableTipoDespesa.TABLE_NAME;
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -142,7 +143,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteAllOrcamento(){
+    public void deleteAllOrcamento(){ //remove valor do orçamento
         String query = "DELETE FROM "+DbTableOrcamento.TABLE_NAME;
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -159,7 +160,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteAllRegistosMovimentos(){
+    public void deleteAllRegistosMovimentos(){ //remove todos os registos
         String query = "DELETE FROM "+DbTableRegistoMovimentos.TABLE_NAME;
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -176,25 +177,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    //Teste
-    public double getOrcamentoFromDb(){
-        String query = "SELECT "+DbTableOrcamento.VALOR_COLUMN+
-                        " FROM "+DbTableOrcamento.TABLE_NAME+
-                        " WHERE "+DbTableOrcamento._ID+
-                        " = (SELECT MAX("+DbTableOrcamento._ID+") FROM "+DbTableOrcamento.TABLE_NAME+")";
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-
-        double valor = 0;
-        if (cursor.moveToFirst()){
-            valor = cursor.getDouble(cursor.getColumnIndex(DbTableOrcamento.VALOR));
-        }
-
-        return valor;
-    }
-
-    public List<RegistoMovimentos> getListRegistoMovimentos(){
+    public List<RegistoMovimentos> getListRegistoMovimentos(){ //lista com todos os registos
 
         String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME;
 
@@ -228,7 +211,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return registosLinkedList;
     }
 
-    public List<RegistoMovimentos> getListRegistoMovimentosAno(int ano){
+    public List<RegistoMovimentos> getListRegistoMovimentosAno(int ano){ //lista com os registo por ano
 
         String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.ANO+"=?";
 
@@ -262,7 +245,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return registosLinkedList;
     }
 
-    public List<RegistoMovimentos> getListRegistoMovimentosMes(int mes, int ano){
+    public List<RegistoMovimentos> getListRegistoMovimentosMes(int mes, int ano){ //lista com os registos por mes e ano
 
         String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.ANO+"=?"+" AND "+DbTableRegistoMovimentos.MES+"=?";
 
@@ -296,7 +279,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return registosLinkedList;
     }
 
-    public List<RegistoMovimentos> getListRegistoMovimentosDia(int dia, int mes, int ano){
+    public List<RegistoMovimentos> getListRegistoMovimentosDia(int dia, int mes, int ano){ //lista com os registos por dia, mes e ano
 
         String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos.ANO+"=? AND "+DbTableRegistoMovimentos.MES+"=? AND "+DbTableRegistoMovimentos.DIA+"=?";
 
@@ -330,7 +313,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return registosLinkedList;
     }
 
-    public RegistoMovimentos getRegistoFromRecycler(String id){
+    public RegistoMovimentos getRegistoFromRecycler(String id){ //devolve um objeoto do tipo RegistoMovimentos
         String query = "SELECT * FROM "+DbTableRegistoMovimentos.TABLE_NAME+" WHERE "+DbTableRegistoMovimentos._ID+"=?";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -356,7 +339,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
     }
 
 
-    public String getTipoDespesaByID(int id){
+    public String getTipoDespesaByID(int id){ //devolve tipo despesa dado um ID
         String query = "SELECT "+DbTableTipoDespesa.CATEGORIA_DESPESAS+" FROM "+DbTableTipoDespesa.TABLE_NAME+" WHERE "+DbTableTipoDespesa._ID+"=?";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -373,7 +356,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return categoria;
     }
 
-    public String getTipoReceitaByID(int id){
+    public String getTipoReceitaByID(int id){ //devolve tipo receita por ID
         String query = "SELECT "+DbTableTipoReceita.CATEGORIA_RECEITA+" FROM "+DbTableTipoReceita.TABLE_NAME+" WHERE "+DbTableTipoReceita._ID+"=?";
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -390,28 +373,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         return categoria;
     }
 
-    public TipoReceita getCatReceita(){
-        String query = "SELECT * FROM "+DbTableTipoReceita.TABLE_NAME;
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-
-        TipoReceita tipoReceita = new TipoReceita();
-        if (cursor.getCount() > 0){
-            cursor.moveToFirst();
-            do{
-                tipoReceita.setId_receita(cursor.getColumnIndex(DbTableTipoReceita._ID));
-                tipoReceita.setCategoria(String.valueOf(cursor.getColumnIndex(DbTableTipoReceita.CATEGORIA_RECEITA)));
-            }while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        db.close();
-
-        return tipoReceita;
-    }
-
-    public void deleteRegistoMovimento(String id){
+    public void deleteRegistoMovimento(String id){ //apaga um registo dado um ID
         //Escrita
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -422,7 +384,7 @@ public class DbContabOpenHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public String checkReceitaDespesa(String id){
+    public String checkReceitaDespesa(String id){ //devolve receita/despesa
         //Leitura
         SQLiteDatabase db = this.getReadableDatabase();
 
