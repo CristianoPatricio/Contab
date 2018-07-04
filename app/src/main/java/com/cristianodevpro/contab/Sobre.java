@@ -27,7 +27,7 @@ public class Sobre extends AppCompatActivity {
     /************************Functions***************************/
 
     /**
-     * preencher campos TO, SUBJECT, TEXT de uma mensagem de correio eletrónico
+     * preencher campos TO, SUBJECT, TEXT de uma mensagem de correi
      *
      * @param view
      */
@@ -35,7 +35,7 @@ public class Sobre extends AppCompatActivity {
         Intent i = new Intent();
         i.setAction(Intent.ACTION_SEND);
         i.putExtra(Intent.EXTRA_TEXT, "A sua mensagem de texto...");
-        i.putExtra(Intent.EXTRA_EMAIL, "dicasdeinformatica2015@gmail.com");
+        i.putExtra(Intent.EXTRA_EMAIL, "cristianop1998@gmail.com");
         i.putExtra(Intent.EXTRA_SUBJECT, "Suporte Contab");
         i.setType("text/plain");
         startActivity(i);

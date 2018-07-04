@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="Definir Orçamento"
+        android:text="@string/qto_pode_gastar_mes"
         android:textColor="@android:color/background_dark"
         android:textSize="24sp"
         app:fontFamily="@font/advent_pro_semibold" />
@@ -21,6 +21,8 @@
         android:layout_below="@+id/textView6"
         android:layout_centerHorizontal="true"
         android:ems="10"
-        android:hint="Valor do orçamento"
-        android:inputType="numberDecimal" />
+        android:hint="@string/valor_euros"
+        android:inputType="numberDecimal"
+        android:maxLength="9" />
+
 </RelativeLayout>

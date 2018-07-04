@@ -130,7 +130,7 @@ public class ListarMes extends AppCompatActivity {
                 adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosMes(mes, ano), ListarMes.this, recyclerViewListarMes);
 
                 if (dbContabOpenHelper.getListRegistoMovimentosMes(mes, ano).size()==0){ //se não devolver registos
-                    Toast.makeText(getApplicationContext(),getString(R.string.nao_foram_encontrados_registos_para)+" "+mesText+" "+getString(R.string.de)+" "+ano, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.nao_foram_encontrados_registos_para)+" "+mesText+" "+ano, Toast.LENGTH_LONG).show();
                 }
 
                 recyclerViewListarMes = (RecyclerView) findViewById(R.id.recyclerViewListarMes);
@@ -158,7 +158,7 @@ public class ListarMes extends AppCompatActivity {
                 adapter = new RegistoMovimentosAdapter(dbContabOpenHelper.getListRegistoMovimentosMes(mes, ano), ListarMes.this, recyclerViewListarMes);
 
                 if (dbContabOpenHelper.getListRegistoMovimentosMes(mes, ano).size()==0){ //se não devolver registos
-                    Toast.makeText(getApplicationContext(),getString(R.string.nao_foram_encontrados_registos_para)+" "+mesText+" "+getString(R.string.de)+" "+ano, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.nao_foram_encontrados_registos_para)+" "+mesText+" "+ano, Toast.LENGTH_LONG).show();
                 }
 
                 recyclerViewListarMes = (RecyclerView) findViewById(R.id.recyclerViewListarMes);

@@ -5,13 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#e7e7e7"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".NovaDespesa"
-    tools:showIn="@layout/activity_nova_despesa">
+    tools:context=".NovaDespesa">
 
     <Button
         android:id="@+id/buttonInserirDespesa"
-        android:layout_width="300dp"
+        android:layout_width="320dp"
         android:layout_height="60dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
@@ -20,7 +18,7 @@
         android:layout_marginTop="64dp"
         android:background="@drawable/buttoninserirdespesa_shape"
         android:onClick="inserirDespesaDb"
-        android:text="INSERIR DESPESA"
+        android:text="@string/inserir_despesa"
         android:textColor="@android:color/background_light"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,8 +33,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:ems="10"
-        android:hint="valor (€)"
+        android:hint="@string/valor_despesa"
         android:inputType="numberDecimal"
+        android:maxLength="9"
         app:layout_constraintStart_toEndOf="@+id/textView21"
         app:layout_constraintTop_toBottomOf="@+id/editTextDesignacaoDespesa" />
 
@@ -65,8 +64,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Descrição da despesa (opcional)"
+        android:hint="@string/descricao_despesa"
         android:inputType="textPersonName"
+        android:maxLength="50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,11 +101,11 @@
         android:text="+"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/relativeLayout"
+        app:layout_constraintStart_toEndOf="@+id/relativeLayoutAno"
         app:layout_constraintTop_toTopOf="parent" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout"
+        android:id="@+id/relativeLayoutAno"
         android:layout_width="187dp"
         android:layout_height="34dp"
         android:layout_marginLeft="8dp"
@@ -204,4 +204,21 @@
         android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/buttoncancelar_shape"
+        android:onClick="cancel"
+        android:text="@string/cancelar"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonInserirDespesa" />
 </android.support.constraint.ConstraintLayout>

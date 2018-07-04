@@ -15,7 +15,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:text="DESENVOLVIDA POR:"
+        android:text="@string/desenvolvida_por"
         android:textColor="@android:color/black"
         android:textSize="30sp"
         app:fontFamily="@font/advent_pro_semibold"
@@ -49,7 +49,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
-        android:text="Programação Avançada"
+        android:text="@string/programacao_avancada"
         android:textSize="18sp"
         app:fontFamily="@font/advent_pro_semibold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +65,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="ESTG-IPG | Engenharia Informática"
+        android:text="@string/estg_ipg_ei"
         android:textSize="18sp"
         app:fontFamily="@font/advent_pro_semibold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -105,17 +105,36 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="158dp"
-        android:layout_height="168dp"
+        android:layout_width="111dp"
+        android:layout_height="108dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12"
+        app:srcCompat="@drawable/logo_novo" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:onClick="sendEmail"
+        android:text="@string/contact"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView12"
-        app:srcCompat="@drawable/logo_menu" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+
 </android.support.constraint.ConstraintLayout>

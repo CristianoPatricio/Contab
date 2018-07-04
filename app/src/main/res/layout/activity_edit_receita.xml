@@ -29,7 +29,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:contentDescription="TODO"
+        android:contentDescription="@string/todo"
         android:onClick="definirDataEditReceita"
         app:layout_constraintStart_toEndOf="@+id/textViewShowDiaMesAno"
         app:layout_constraintTop_toTopOf="parent"
@@ -137,7 +137,7 @@
         android:layout_marginTop="64dp"
         android:background="@drawable/buttoninserirreceita_shape"
         android:onClick="atualizarReceita"
-        android:text="ATUALIZAR RECEITA"
+        android:text="@string/atualizar_receita"
         android:textColor="@android:color/background_light"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -185,7 +185,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="@string/descri_o_da_receita_opcional"
+        android:hint="@string/descricao_receita"
         android:inputType="textPersonName"
         android:maxLength="50"
         app:layout_constraintEnd_toEndOf="parent"
@@ -206,5 +206,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/datePickerButton"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/buttoncancelar_shape"
+        android:onClick="cancel"
+        android:text="@string/cancelar"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonInserirReceita" />
 
 </android.support.constraint.ConstraintLayout>

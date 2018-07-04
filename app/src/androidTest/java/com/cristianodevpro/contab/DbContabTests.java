@@ -10,6 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 /**
@@ -45,38 +48,37 @@ public class DbContabTests {
     public void OrcamentoCRUDTest(){
         //Abrir BD
         DbContabOpenHelper dbContabOpenHelper = new DbContabOpenHelper(getContext());
-
         //Op. escrita
         SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
         DbTableOrcamento tableOrcamento = new DbTableOrcamento(db);
 
         Orcamento orcamento = new Orcamento();
-        orcamento.setId_orcamento("060618234301");
-        orcamento.setValor(500.0);
+        orcamento.setValor(600.0);
+        orcamento.setValor(700.0);
+        orcamento.setValor(800.0);
 
         //Insert/Create (C)RUD
-        long insert = tableOrcamento.insert(DbTableOrcamento.getContentValues(orcamento));
-        assertNotEquals("Erro ao inserir orçamento",-1,insert); //Se der -1 é porque não foi possível inserir o registo
+        long id = tableOrcamento.insert(DbTableOrcamento.getContentValues(orcamento));
+        assertNotEquals("Erro ao inserir orçamento",-1,id); //Se der -1 é porque não foi possível inserir o registo
 
         //query/Read C/R)UD
-        orcamento = ReadFirstOrcamento(tableOrcamento, 500.0, "060618234301");
+        orcamento = ReadFirstOrcamento(tableOrcamento, 600.0, id);
 
         //update CR(U)D
-        orcamento.setId_orcamento("070618000902");
-        orcamento.setValor(600.0);
+        orcamento.setValor(200.0);
 
         int rowsAffected = tableOrcamento.update(
                 DbTableOrcamento.getContentValues(orcamento),
-                DbTableOrcamento.ID_ORCAMENTO + "=?",
-                new String[]{"060618234301"}
+                DbTableOrcamento._ID + "=?",
+                new String[]{Long.toString(id)}
         );
         assertEquals("Erro ao atualizar orçamento",1,rowsAffected);
 
         //delete CRU(D)
         rowsAffected = tableOrcamento.delete(
-                DbTableOrcamento.ID_ORCAMENTO+"=?",
-                new String[]{"070618000902"}
+                DbTableOrcamento._ID+"=?",
+                new String[]{Long.toString(id)}
                 );
         assertEquals("Erro ao eliminar orçamento",1,rowsAffected);
 
@@ -97,35 +99,40 @@ public class DbContabTests {
 
         TipoReceita tipoReceita = new TipoReceita();
         tipoReceita.setCategoria("Vencimento");
+        tipoReceita.setCategoria("Depósito");
+        tipoReceita.setCategoria("Economias");
 
         //Insert/Create (C)RUD
         long id = tableTipoReceita.insert(DbTableTipoReceita.getContentValues(tipoReceita));
         assertNotEquals("Erro ao inserir categoria",-1,id); //Se der -1 é porque não foi possível inserir o registo
 
         //query/Read C/R)UD
-        tipoReceita = ReadFirstTipoReceita(tableTipoReceita,"Vencimento",id);
+        //tipoReceita = ReadFirstTipoReceita(tableTipoReceita,"Vencimento",id);
         //int idCat = ReadIdCategoriaReceita(tableTipoReceita, "Vencimento", 2);
+        //ArrayList<String> list = ReadCategoriasReceitaFromDb(tableTipoReceita, );
+        String categoria = dbContabOpenHelper.getTipoReceitaByID((int)id);
+        assertEquals("Categoria não encontrada","Economias",categoria);
 
         //update CR(U)D
         tipoReceita.setCategoria("Salário");
 
         int rowsAffected = tableTipoReceita.update(
                 DbTableTipoReceita.getContentValues(tipoReceita),
-                DbTableTipoReceita.ID_RECEITA + "=?",
+                DbTableTipoReceita._ID + "=?",
                 new String[]{Long.toString(id)}
         );
         assertEquals("Erro ao atualizar categoria",1,rowsAffected);
 
         //delete CRU(D)
         rowsAffected = tableTipoReceita.delete(
-                DbTableTipoReceita.ID_RECEITA+"=?",
+                DbTableTipoReceita._ID+"=?",
                 new String[]{Long.toString(id)}
         );
         assertEquals("Erro ao eliminar categoria",1,rowsAffected);
 
 
-        Cursor cursor = tableTipoReceita.query(DbTableTipoReceita.ALL_COLUMNS, null, null, null, null, null);
-        assertEquals("Categorias encontradas depois de eliminadas...",0,cursor.getCount());
+        Cursor cursor1 = tableTipoReceita.query(DbTableTipoReceita.ALL_COLUMNS, null, null, null, null, null);
+        assertEquals("Categorias encontradas depois de eliminadas...",0,cursor1.getCount());
     }
 
     @Test
@@ -153,14 +160,14 @@ public class DbContabTests {
 
         int rowsAffected = tableTipoDespesa.update(
                 DbTableTipoDespesa.getContentValues(tipoDespesa),
-                DbTableTipoDespesa.ID_DESPESA + "=?",
+                DbTableTipoDespesa._ID + "=?",
                 new String[]{Long.toString(id)}
         );
         assertEquals("Erro ao atualizar categoria",1,rowsAffected);
 
         //delete CRU(D)
         rowsAffected = tableTipoDespesa.delete(
-                DbTableTipoDespesa.ID_DESPESA+"=?",
+                DbTableTipoDespesa._ID+"=?",
                 new String[]{Long.toString(id)}
         );
         assertEquals("Erro ao eliminar categoria",1,rowsAffected);
@@ -179,7 +186,6 @@ public class DbContabTests {
         SQLiteDatabase db = dbContabOpenHelper.getWritableDatabase();
 
         DbTableTipoDespesa tableTipoDespesa = new DbTableTipoDespesa(db);
-        DbTableTipoReceita tableTipoReceita = new DbTableTipoReceita(db);
         DbTableRegistoMovimentos tableRegistoMovimentos = new DbTableRegistoMovimentos(db);
 
         TipoDespesa tipoDespesa = new TipoDespesa();
@@ -196,28 +202,29 @@ public class DbContabTests {
         registoMovimentos.setReceitadespesa("Despesa");
         registoMovimentos.setDesignacao("Almoço cantina");
         registoMovimentos.setValor(4.8);
-        //registoMovimentos.setTiporeceita(Integer.parseInt("NULL"));
         registoMovimentos.setTipodespesa((int)idDespesa);
 
         tableRegistoMovimentos.insert(DbTableRegistoMovimentos.getContentValues(registoMovimentos));
         assertNotEquals("Erro ao inserir registo",-1,1); //Se der -1 é porque não foi possível inserir o registo
 
         //query/Read C/R)UD
-        registoMovimentos = ReadFirstRegisto(tableRegistoMovimentos,"080618113201",8,6,2018,"Despesa","Almoço cantina",4.8,1);
+        registoMovimentos = ReadFirstRegisto(tableRegistoMovimentos,"080618113201",8,6,2018,"Despesa","Almoço cantina",4.8,(int) idDespesa);
+        double valor =  getValorDespesas(tableRegistoMovimentos, 4.8);
 
         //update CR(U)D
         registoMovimentos.setDesignacao("Almoço churrasqueira");
 
+
         int rowsAffected = tableRegistoMovimentos.update(
                 DbTableRegistoMovimentos.getContentValues(registoMovimentos),
-                DbTableRegistoMovimentos.ID_MOVIMENTO + "=?",
+                DbTableRegistoMovimentos._ID + "=?",
                 new String[]{"080618113201"}
         );
         assertEquals("Erro ao atualizar categoria",1,rowsAffected);
 
         //delete CRU(D)
         rowsAffected = tableRegistoMovimentos.delete(
-                DbTableRegistoMovimentos.ID_MOVIMENTO+"=?",
+                DbTableRegistoMovimentos._ID+"=?",
                 new String[]{"080618113201"}
         );
         assertEquals("Erro ao eliminar categoria",1,rowsAffected);
@@ -228,7 +235,7 @@ public class DbContabTests {
 
     }
 
-    private Orcamento ReadFirstOrcamento(DbTableOrcamento tableOrcamento, double expectedValue, String expectedId) {
+    private Orcamento ReadFirstOrcamento(DbTableOrcamento tableOrcamento, double expectedValue, long expectedId) {
         Cursor cursor = tableOrcamento.query(DbTableOrcamento.ALL_COLUMNS, null, null, null, null, null);
         assertEquals("Erro ao ler orçamento",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
 
@@ -238,7 +245,7 @@ public class DbContabTests {
         Orcamento orcamento = DbTableOrcamento.getCurrentOrcamentoFromCursor(cursor);
 
         assertEquals("Valor do orçamento incorreto",expectedValue, orcamento.getValor(), 0.001);
-        assertEquals("Id do orçamento incorreto",expectedId,orcamento.getId_orcamento());
+        assertEquals("Id do orçamento incorreto",expectedId, orcamento.getId_orcamento());
 
         return orcamento;
     }
@@ -274,13 +281,13 @@ public class DbContabTests {
     }
 
     private RegistoMovimentos ReadFirstRegisto(DbTableRegistoMovimentos tableRegistoMovimentos, String expectedId, int expectedDia, int expectedMes, int expectedAno, String expectedRecDes, String expectedDesig, double expectedValor, int expectedTipoDes) {
-        Cursor cursor = tableRegistoMovimentos.query(DbTableRegistoMovimentos.ALL_COLUMNS, null, null, null, null, null);
+        Cursor cursor = tableRegistoMovimentos.query(DbTableRegistoMovimentos.INSERT_DESPESA_COLUMNS, null, null, null, null, null);
         assertEquals("Erro ao ler tipo receita",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
 
-        //Obter a primeira categoria de receitas
+        //Obter a primeiro registo
         assertTrue("Erro ao ler a categoria da receita",cursor.moveToNext());
 
-        RegistoMovimentos registoMovimentos = DbTableRegistoMovimentos.getCurrentTipoDespesaRegistoMovimentoFromCursor(cursor);
+        RegistoMovimentos registoMovimentos = DbTableRegistoMovimentos.getCurrentRegistoMovimentoDespesaFromCursor(cursor);
 
         assertEquals("Id registo incorreto",expectedId,registoMovimentos.getId_movimento());
         assertEquals("Dia registo incorreto",expectedDia,registoMovimentos.getDia());
@@ -289,10 +296,27 @@ public class DbContabTests {
         assertEquals("ReceitaDespesa registo incorreto",expectedRecDes,registoMovimentos.getReceitadespesa());
         assertEquals("Designacao registo incorreto",expectedDesig,registoMovimentos.getDesignacao());
         assertEquals("Valor registo incorreto",expectedValor,registoMovimentos.getValor(), 0.001);
-        //assertEquals("Tipo receita registo incorreto",expectedTipoRec,registoMovimentos.getTiporeceita());
         assertEquals("Tipo despesa registo incorreto",expectedTipoDes,registoMovimentos.getTipodespesa());
 
         return registoMovimentos;
+    }
+
+    private double getValorDespesas(DbTableRegistoMovimentos tableRegistoMovimentos, double expectedValue){
+        Cursor cursor = tableRegistoMovimentos.query(new String[]{"SUM(valor)"}, "receitadespesa =?", new String[]{"Despesa"}, null, null, null);
+        assertEquals("Erro ao ler tipo receita",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
+
+        //Obter a primeiro registo
+
+        assertTrue("Erro ao ler a categoria da receita",cursor.moveToNext());
+        double valor = 0;
+        if (cursor.getCount() > 0){
+            cursor.moveToFirst();
+            valor = cursor.getDouble(cursor.getColumnIndex("valor"));
+        }
+
+        assertEquals("Valor incorreto",expectedValue,valor,0.001);
+        return valor;
+
     }
 
     private int ReadIdCategoriaReceita(DbTableTipoReceita tableTipoReceita, String categoria, int expectedId){
@@ -304,4 +328,13 @@ public class DbContabTests {
 
         return id;
     }
+
+    /*
+    private ArrayList<String> ReadCategoriasReceitaFromDb(DbTableTipoReceita tableTipoReceita, char[] expectedArray){
+
+        Cursor cursor = tableTipoReceita.query(DbTableTipoReceita.CATEGORIA_COLUMN,null, null, null, null, null);
+        assertEquals("Erro ao ler tipo receita",1,cursor.getCount()); //caso não devolva 1 linha, dá erro
+
+        return list;
+    }*/
 }

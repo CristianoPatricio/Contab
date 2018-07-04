@@ -183,7 +183,7 @@ public class NovaDespesa extends AppCompatActivity implements DatePickerDialog.O
                                     registoMovimentos.getValor(),
                                     registoMovimentos.getTipodespesa()
             );
-            Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), R.string.registo_inserido_success,Snackbar.LENGTH_LONG).setAction("Anular", new View.OnClickListener() {
+            Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), R.string.registo_inserido_success,Snackbar.LENGTH_LONG).setAction(R.string.anular_registo, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {

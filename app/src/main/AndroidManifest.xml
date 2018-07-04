@@ -7,11 +7,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,22 +28,65 @@
 
         <activity
             android:name=".NovaReceita"
-            android:label="@string/title_activity_nova_receita"
-            android:parentActivityName=".MainActivity"/>
+            android:label="@string/Nova_receita_actv"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".Sobre"
-            android:label="@string/title_activity_sobre"
-            android:parentActivityName=".MainActivity"
-            />
+            android:label="@string/sobre"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".NovaDespesa"
-            android:label="@string/title_activity_nova_despesa"
+            android:label="@string/nova_despesa_act"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".Definicoes"
+            android:label="@string/definicoes"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".GerirCategorias"
+            android:label="@string/gerir_cat"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ListarTodos"
+            android:label="@string/listar_todos"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EditReceita"
+            android:label="@string/editar_receita"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EditDespesa"
+            android:label="@string/editar_despesa"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ListarAno"
+            android:label="@string/listar_ano"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ListarMes"
+            android:label="@string/listar_mes"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ListarDia"
+            android:label="@string/listar_dia"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.cristianodevpro.contab.MainActivity" />
-        </activity>
+            ></activity>
+
+        <provider
+            android:authorities="com.cristianodevpro.contab.ContabContentProvider"
+            android:name="com.cristianodevpro.contab.ContabContentProvider"
+            android:exported="false" />
     </application>
 
 </manifest>

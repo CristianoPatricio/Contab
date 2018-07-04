@@ -6,32 +6,36 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_ldia"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Listar por dia" />
+            android:icon="@drawable/ic_menu_sort_by_size"
+            android:title="@string/listar_por_dia" />
         <item
             android:id="@+id/nav_lmes"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Listar por mês" />
+            android:icon="@drawable/ic_menu_sort_by_size"
+            android:title="@string/listar_por_mes" />
         <item
             android:id="@+id/nav_lano"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Listar por ano" />
+            android:icon="@drawable/ic_menu_sort_by_size"
+            android:title="@string/listar_por_ano" />
         <item
             android:id="@+id/nav_ltodos"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Listar todos" />
+            android:icon="@drawable/ic_menu_sort_by_size"
+            android:title="@string/listar_todos_1" />
         <item
             android:id="@+id/nav_orca"
+            android:icon="@drawable/ic_menu_add"
+            android:title="@string/definir_orca" />
+        <item
+            android:id="@+id/nav_gestcategorias"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Definir orçamento" />
+            android:title="@string/gerir_cat" />
     </group>
 
-    <item android:title="Acerca">
+    <item android:title="@string/acerca">
         <menu>
             <item
                 android:id="@+id/nav_sobre"
-                android:icon="@drawable/ic_menu_manage"
-                android:title="Sobre" />
+                android:icon="@drawable/ic_menu_info_details"
+                android:title="@string/sobre" />
         </menu>
     </item>
 

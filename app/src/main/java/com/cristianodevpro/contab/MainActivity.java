@@ -400,10 +400,10 @@ public class MainActivity extends AppCompatActivity
                     textViewShowDiaMesAno.setText(""+DadosDefinicoesToMain.getMes()+"/"+DadosDefinicoesToMain.getAno());
                     break;
                 case "ano":
-                    textViewShowDiaMesAno.setText("Ano "+DadosDefinicoesToMain.getAno());
+                    textViewShowDiaMesAno.setText(getString(R.string.ano)+" "+DadosDefinicoesToMain.getAno());
                     break;
                 default:
-                    textViewShowDiaMesAno.setText("Geral");
+                    textViewShowDiaMesAno.setText(R.string.geral);
             }
         }
 

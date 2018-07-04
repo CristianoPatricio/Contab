@@ -138,7 +138,7 @@ public class Definicoes extends AppCompatActivity implements DatePickerDialog.On
 
         //Mostra valor do orçamento
         double valorOrcamento = getValorOrcamentoFromDb();
-        textViewShowValorOrcamento.setText(""+valorOrcamento+"€");
+        textViewShowValorOrcamento.setText(""+String.format("%.2f",valorOrcamento)+"€");
 
         if(radioButtonTodos.isChecked()){
             DadosDefinicoesToMain.setTipo("todos");
@@ -252,18 +252,18 @@ public class Definicoes extends AppCompatActivity implements DatePickerDialog.On
 
     public void loadSpinnerDataMes(){ //carrega os dados para o spinner dos meses
         List<String> list = new ArrayList<>();
-        list.add("janeiro");
-        list.add("fevereiro");
-        list.add("março");
-        list.add("abril");
-        list.add("maio");
-        list.add("junho");
-        list.add("julho");
-        list.add("agosto");
-        list.add("setembro");
-        list.add("outubro");
-        list.add("novembro");
-        list.add("dezembro");
+        list.add(getString(R.string.janeiro));
+        list.add(getString(R.string.fevereiro));
+        list.add(getString(R.string.marco));
+        list.add(getString(R.string.abril));
+        list.add(getString(R.string.maio));
+        list.add(getString(R.string.junho));
+        list.add(getString(R.string.julho));
+        list.add(getString(R.string.agosto));
+        list.add(getString(R.string.setembro));
+        list.add(getString(R.string.outubro));
+        list.add(getString(R.string.novembro));
+        list.add(getString(R.string.dezembro));
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -341,29 +341,29 @@ public class Definicoes extends AppCompatActivity implements DatePickerDialog.On
     private String mesToString(int mes){
         switch (mes){
             case 1:
-                return "janeiro";
+                return getString(R.string.janeiro);
             case 2:
-                return "fevereiro";
+                return getString(R.string.fevereiro);
             case 3:
-                return "março";
+                return getString(R.string.marco);
             case 4:
-                return "abril";
+                return getString(R.string.abril);
             case 5:
-                return "maio";
+                return getString(R.string.maio);
             case 6:
-                return "junho";
+                return getString(R.string.junho);
             case 7:
-                return "julho";
+                return getString(R.string.julho);
             case 8:
-                return "agosto";
+                return getString(R.string.agosto);
             case 9:
-                return "setembro";
+                return getString(R.string.setembro);
             case 10:
-                return "outubro";
+                return getString(R.string.outubro);
             case 11:
-                return "novembro";
+                return getString(R.string.novembro);
             case 12:
-                return "dezembro";
+                return getString(R.string.dezembro);
         }
         return null;
     }

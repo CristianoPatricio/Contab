@@ -118,4 +118,5 @@
     <string name="listar_por_mes">List by month</string>
     <string name="listar_por_ano">List by year</string>
     <string name="listar_todos_1">List all</string>
+    <string name="vencimento_cat_rec">Salary</string>
 </resources>
