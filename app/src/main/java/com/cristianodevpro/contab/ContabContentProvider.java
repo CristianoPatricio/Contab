@@ -12,7 +12,11 @@ import android.support.annotation.Nullable;
 
 public class ContabContentProvider extends ContentProvider {
 
-    public static final String AUTHORITY = "com.cristianodevpro.contab";
+    public static final String AUTHORITY = "com.cristianodevpro.contab.ContabContentProvider";
+
+    public static final Uri BASE_URI = Uri.parse("content://"+AUTHORITY);
+    public static final Uri CONTAB_URI = Uri.withAppendedPath(BASE_URI,DbTableRegistoMovimentos.TABLE_NAME);
+    public static final Uri CATEGORIAS_RECEITAS_URI = Uri.withAppendedPath(BASE_URI, DbTableTipoReceita.TABLE_NAME);
 
     private static final int CATEGORIAS_RECEITAS = 200;
     private static final int CATEGORIAS_RECEITAS_ID = 201;
@@ -61,12 +65,11 @@ public class ContabContentProvider extends ContentProvider {
 
             case CATEGORIAS_RECEITAS:
                 return new DbTableTipoReceita(db).query(projection,selection,selectionArgs,null,null,sortOrder);
+            case CATEGORIAS_RECEITAS_ID:
+                return new DbTableTipoReceita(db).query(projection, DbTableTipoReceita._ID+"=?",new String[]{id},null,null,sortOrder);
 
-                case CATEGORIAS_RECEITAS_ID:
-                    return new DbTableTipoReceita(db).query(projection, DbTableTipoReceita._ID+"=?",new String[]{id},null,null,sortOrder);
-
-                default:
-                    throw new UnsupportedOperationException("Invalid URI: " + uri);
+            default:
+                throw new UnsupportedOperationException("Invalid URI: " + uri);
         }
     }
 
@@ -86,9 +89,8 @@ public class ContabContentProvider extends ContentProvider {
 
             case CATEGORIAS_RECEITAS_ID:
                 return SINGLE_ITEM+"/"+AUTHORITY+"/"+DbTableTipoReceita.TABLE_NAME;
-
-                default:
-                    throw new UnsupportedOperationException("Unknown URI: "+uri);
+            default:
+                throw new UnsupportedOperationException("Unknown URI: "+uri);
         }
     }
 
@@ -111,9 +113,8 @@ public class ContabContentProvider extends ContentProvider {
             case CATEGORIAS_RECEITAS:
                 id = new DbTableTipoReceita(db).insert(values);
                 break;
-
-                default:
-                    throw new UnsupportedOperationException("Invalid URI: "+uri);
+            default:
+                throw new UnsupportedOperationException("Invalid URI: "+uri);
         }
 
         if (id > 0){ //foram inseridos registos
@@ -183,8 +184,9 @@ public class ContabContentProvider extends ContentProvider {
                 rows = new DbTableTipoReceita(db).update(values,DbTableTipoReceita._ID+"=?",new String[]{id});
                 break;
 
-                default:
-                    throw new UnsupportedOperationException("Invalid URI: "+uri);
+            default:
+                throw new UnsupportedOperationException("Invalid URI: "+uri);
+
         }
 
         if (rows > 0) notifyChanges(uri);
