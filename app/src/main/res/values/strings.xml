@@ -1,18 +1,18 @@
 <resources>
     <string name="app_name">Contab</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings" translatable="false">Settings</string>
     <string name="nova_receita">NOVA RECEITA</string>
     <string name="nova_despesa">NOVA DESPESA</string>
     <string name="saldo">Saldo:</string>
     <string name="receitas">Receitas:</string>
     <string name="despesas">Despesas:</string>
-    <string name="show_saldo_main">TextView</string>
-    <string name="show_despesas_main">TextView</string>
-    <string name="show_receitas_main">TextView</string>
+    <string name="show_saldo_main" translatable="false">TextView</string>
+    <string name="show_despesas_main" translatable="false">TextView</string>
+    <string name="show_receitas_main" translatable="false">TextView</string>
     <string name="escolha_a_data">Escolha a data:</string>
     <string name="categoria">Categoria:</string>
     <string name="designacao">Designação:</string>
@@ -31,7 +31,7 @@
     <string name="valor_euros">valor (€)</string>
     <string name="atualizar_receita">ATUALIZAR RECEITA</string>
     <string name="cancelar2">cancelar</string>
-    <string name="todo">TODO</string>
+    <string name="todo" translatable="false">TODO</string>
     <string name="cate_ja_exist">Categoria já existente!</string>
     <string name="Nova_receita_actv">Nova Receita...</string>
     <string name="cancelar_dialog_cat">Cancelar</string>
@@ -123,7 +123,6 @@
     <string name="listar_por_ano">Listar por ano</string>
     <string name="listar_todos_1">Listar todos</string>
     <string name="definir_orca">Definir orçamento</string>
-    <string name="gerir_Cat">Gerir categorias</string>
     <string name="acerca">Acerca</string>
 
 </resources>

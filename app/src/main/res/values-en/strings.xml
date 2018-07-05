@@ -20,7 +20,6 @@
     <string name="resultados_dia">Results for day</string>
     <string name="todos">All</string>
     <string name="atualizar_despesa">Update Expense</string>
-    <string name="descri_o_da_despesa_opcional">Expense description (optional)</string>
     <string name="cancelar">Cancel</string>
     <string name="valor_euros">Amount (€)</string>
     <string name="atualizar_receita">Update Income</string>
@@ -79,7 +78,6 @@
     <string name="atualizar">Update</string>
     <string name="eliminar">Delete</string>
     <string name="cancelar_adapter">Cancel</string>
-    <string name="vencimento_1">Salary</string>
     <string name="sobre">About</string>
     <string name="nova_despesa_act">New Expense...</string>
     <string name="definicoes">Settings</string>
@@ -118,5 +116,4 @@
     <string name="listar_por_mes">List by month</string>
     <string name="listar_por_ano">List by year</string>
     <string name="listar_todos_1">List all</string>
-    <string name="vencimento_cat_rec">Salary</string>
 </resources>
