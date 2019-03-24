@@ -10,3 +10,5 @@ Main app functionalities:
 -> Add new categories;
 -> Define a limit of budget;
 -> View a daily, monthly and annual expenses and revenues report;
+---
+All rights reserved. Cristiano Patrício © 2018
